@@ -8,14 +8,10 @@ __pycache__/
 .venv/
 venv/
 
-# Data (downloaded clips, rendered output)
+# Data (generated clips, rendered output)
 data/raw/
 data/output/
-data/cache/
 data/used_clips.json
-
-# But keep committed clips tracked
-!data/clips/
 
 # OS
 Thumbs.db

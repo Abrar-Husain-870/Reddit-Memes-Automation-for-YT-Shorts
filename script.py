@@ -1,18 +1,16 @@
 """
-Generate brainrot scripts for GTA V clips using Groq LLM (free tier).
+Generate brainrot scripts for GTA V clips using Groq LLM.
 Target: 70-120 words, funny + engaging brainrot style.
 """
 from __future__ import annotations
 
-import os
 import sys
-from pathlib import Path
 
 from groq import Groq
 
 import config
 
-USER_SYSTEM_PROMPT = (
+SYSTEM_PROMPT = (
     "You write viral brainrot short-form video scripts. "
     "Your style: chaotic, FUNNY, relatable gamer humor. "
     "Use short punchy lines. Each line is 5-10 words. "
@@ -29,13 +27,13 @@ USER_SYSTEM_PROMPT = (
 )
 
 
-def generate_brainrot_script(
+def generate(
     clip_description: str = "",
     style: str = "chaotic",
 ) -> tuple[str, str]:
-    api_key = config.GROQ_API_KEY or os.environ.get("GROQ_API_KEY")
+    api_key = config.GROQ_API_KEY
     if not api_key:
-        print("❌ GROQ_API_KEY not set!")
+        print("❌ GROQ_API_KEY not set in .env!")
         sys.exit(1)
 
     client = Groq(api_key=api_key)
@@ -55,7 +53,7 @@ def generate_brainrot_script(
         f"TITLE: <clickbait title under 60 chars>"
     )
 
-    print(f"🤖 Groq: generating {style} brainrot script (target 70-120 words)…")
+    print(f"🤖 Groq: generating {style} script (target 70-120 words)…")
 
     best_narration = ""
     best_title = "GTA V BRAINROT 🎮🔥"
@@ -66,17 +64,16 @@ def generate_brainrot_script(
             completion = client.chat.completions.create(
                 model=config.GROQ_MODEL,
                 messages=[
-                    {"role": "system", "content": USER_SYSTEM_PROMPT},
+                    {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.95,
                 max_tokens=800,
-                timeout=30,  # 30 second timeout for Groq API
+                timeout=30,
             )
         except Exception as e:
-            print(f"   ⚠ Groq API error (attempt {attempt+1}): {e}")
+            print(f"   ⚠ API error (attempt {attempt+1}): {e}")
             if attempt == 1:
-                # Use fallback narration
                 best_narration = "When the GTA V physics engine decides to absolutely DESTROY your day 💀 Like bro I was just driving NORMAL and then BOOM a trash truck spawns on my head HAHAHA this game is PEAK chaos I love it 😂🚗💥"
                 best_title = "GTA V BRAINROT 🔥"
                 best_wc = len(best_narration.split())
@@ -120,6 +117,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--style", default="chaotic")
     args = ap.parse_args()
-    n, t = generate_brainrot_script(style=args.style)
+    n, t = generate(style=args.style)
     print(f"\n✅ {len(n.split())} words: {n[:120]}...")
     print(f"📌 {t}")
