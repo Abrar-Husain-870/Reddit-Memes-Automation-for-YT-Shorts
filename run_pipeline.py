@@ -150,11 +150,18 @@ def main() -> None:
         print(f"\n🧠 Step 4/6: Generating {style} brainrot script…")
         narration, title = generate_brainrot_script(style=style)
 
+        # Clean the narration BEFORE both TTS and rendering to keep word counts in sync
+        import re
+        clean_narration = narration.replace("**", "").replace("__", "").replace("*", "")
+        clean_narration = re.sub(r'[^\w\s\'",.!?;:\-]', '', clean_narration).strip()
+        if not clean_narration:
+            clean_narration = "GTA V BRAINROT"
+
         # ── Step 5: TTS ──
         print(f"\n🔊 Step 5/6: Synthesizing voiceover…")
         audio_path = config.OUTPUT_DIR / "voiceover.mp3"
         audio_dur, sentence_timings = synthesize_brainrot_voiceover(
-            narration, output_path=audio_path,
+            clean_narration, output_path=audio_path,
         )
 
         # ── Step 6: Render ──
