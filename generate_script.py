@@ -63,7 +63,9 @@ def _strip_emojis(text: str) -> str:
 
 
 def _parse_structured_response(response: str) -> dict:
-    """Parse the structured LLM response into components."""
+    """Parse the structured LLM response into components.
+    Handles both strict HOOK|BODY|PUNCHLINE format and free-form text.
+    """
     result = {
         "hook": "",
         "body": "",
@@ -76,44 +78,66 @@ def _parse_structured_response(response: str) -> dict:
     lines = response.splitlines()
     current_section = None
     sections = {}
+    found_any_label = False
 
     for line in lines:
         line = line.strip()
+        if not line:
+            continue
         upper = line.upper()
 
         if upper.startswith("HOOK:"):
+            found_any_label = True
             current_section = "hook"
             sections["hook"] = line.split(":", 1)[1].strip()
         elif upper.startswith("BODY:"):
+            found_any_label = True
             current_section = "body"
             sections["body"] = line.split(":", 1)[1].strip()
         elif upper.startswith("PUNCHLINE:"):
+            found_any_label = True
             current_section = "punchline"
             sections["punchline"] = line.split(":", 1)[1].strip()
         elif upper.startswith("EMPHASIS:"):
+            found_any_label = True
             current_section = "emphasis"
             raw = line.split(":", 1)[1].strip()
             result["emphasis"] = [w.strip().upper() for w in raw.split(",") if w.strip()]
         elif upper.startswith("NARRATION:"):
+            found_any_label = True
             result["full_narration"] = line.split(":", 1)[1].strip()
         elif upper.startswith("TITLE:"):
+            found_any_label = True
             result["title"] = line.split(":", 1)[1].strip()[:60]
         elif current_section and line:
             sections[current_section] = sections.get(current_section, "") + " " + line
 
-    # Build structured result
+    # Build structured result from sections
     if sections.get("hook") or sections.get("body") or sections.get("punchline"):
         result["hook"] = sections.get("hook", "")
         result["body"] = sections.get("body", "")
         result["punchline"] = sections.get("punchline", "")
-        # Build full narration from components
         parts = [p for p in [result["hook"], result["body"], result["punchline"]] if p]
         result["full_narration"] = " ".join(parts)
     elif result["full_narration"]:
-        # Try to extract emphasis from full_narration
-        pass
-    else:
+        pass  # Already set from NARRATION: label
+    elif found_any_label:
+        # Had labels but no content - shouldn't happen but handle gracefully
         result["full_narration"] = response
+    else:
+        # No labels at all - treat entire response as free-form narration
+        # Try to extract title from last line if it looks like a title
+        result["full_narration"] = response
+        # Check if last line looks like a title (short, no punctuation)
+        last_line = lines[-1].strip() if lines else ""
+        if last_line and len(last_line.split()) <= 8 and not last_line.endswith((".", "!", "?")):
+            result["title"] = last_line[:60]
+            # Remove title from narration
+            result["full_narration"] = "\n".join(lines[:-1]).strip()
+
+    # Always extract emphasis from narration as fallback
+    if not result["emphasis"] and result["full_narration"]:
+        result["emphasis"] = _extract_emphasis_from_text(result["full_narration"])
 
     return result
 
