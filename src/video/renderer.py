@@ -167,8 +167,9 @@ def render_short(
     # Use relative path prefix or escape backslashes
     ass_safe_path = "data/output/captions.ass"
     
-    # Assemble inputs
+    # Assemble inputs (loop video clip infinitely in case it is shorter than narration audio)
     inputs = [
+        "-stream_loop", "-1",
         "-i", str(clip_path),
         "-i", str(audio_path)
     ]
@@ -242,7 +243,7 @@ def render_short(
         "-c:a", "aac",
         "-b:a", "256k",
         "-ar", "48000",
-        "-shortest",
+        "-t", f"{audio_dur:.2f}",
         "-movflags", "+faststart",
         str(output_path)
     ])
