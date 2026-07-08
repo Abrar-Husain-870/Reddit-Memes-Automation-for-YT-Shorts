@@ -37,7 +37,7 @@ class OpenAILikeProvider(BaseLLMProvider):
         post: RedditPost, 
         mode: str = "commentary", 
         style: str = "chaotic"
-    ) -> Tuple[str, str, List[str]]:
+    ) -> dict:
         try:
             import openai
         except ImportError:
@@ -66,8 +66,7 @@ class OpenAILikeProvider(BaseLLMProvider):
             if not response:
                 raise ValueError("Received empty response from LLM")
 
-            parsed = parse_structured_response(response, default_title=post.title)
-            return parsed["narration"], parsed["title"], parsed["emphasis"]
+            return parse_structured_response(response, default_title=post.title)
 
         except Exception as e:
             logger.error(f"{self.provider.upper()} API error: {e}")

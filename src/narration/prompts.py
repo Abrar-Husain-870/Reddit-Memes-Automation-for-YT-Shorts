@@ -11,9 +11,14 @@ SYSTEM_PROMPT_COMMENTARY = (
     "- Do NOT use any emojis, unicode icons, or markdown formatting (no asterisks, hash signs, etc.).\n"
     "- Emphasize 3-5 important words by writing them in ALL CAPS. These words will be used for kinetic captioning.\n"
     "- Structure your output EXACTLY as follows. Do not include any other text:\n\n"
-    "TITLE: <Clickbait title suitable for YouTube Shorts, under 60 characters>\n"
+    "TITLE: <Short summary title for captions/overlays, under 60 characters>\n"
     "NARRATION: <The spoken script itself with the hook first and 3-5 key words in ALL CAPS>\n"
-    "EMPHASIS: <The exact 3-5 ALL CAPS words from the script, comma-separated>"
+    "EMPHASIS: <The exact 3-5 ALL CAPS words from the script, comma-separated>\n"
+    "YT_TITLE: <A highly engaging, curiosity-driven title, 40-70 characters long, creating curiosity without being misleading, natural, no spammy wording, all ages>\n"
+    "YT_HOOK: <A short 1-2 line description hook to capture attention>\n"
+    "YT_SUMMARY: <A concise 1-2 sentence summary of the Reddit post story>\n"
+    "YT_CATEGORY: <Appropriate YouTube category from: Comedy, Entertainment, Education, People & Blogs>\n"
+    "YT_CONTENT_TAGS: <5-8 content-specific tags/keywords, comma-separated, based on the story topic>"
 )
 
 SYSTEM_PROMPT_NATURAL = (
@@ -25,9 +30,14 @@ SYSTEM_PROMPT_NATURAL = (
     "- Do NOT use any emojis or markdown formatting.\n"
     "- Select 3-5 key words that deserve vocal stress and write them in ALL CAPS.\n"
     "- Structure your output EXACTLY as follows. Do not include any other text:\n\n"
-    "TITLE: <Short summary title, under 60 characters>\n"
+    "TITLE: <Short summary title for captions/overlays, under 60 characters>\n"
     "NARRATION: <The cleaned story text ready to be read aloud, with 3-5 stressed words in ALL CAPS>\n"
-    "EMPHASIS: <The exact 3-5 ALL CAPS words, comma-separated>"
+    "EMPHASIS: <The exact 3-5 ALL CAPS words, comma-separated>\n"
+    "YT_TITLE: <A highly engaging, curiosity-driven title, 40-70 characters long, creating curiosity without being misleading, natural, no spammy wording, all ages>\n"
+    "YT_HOOK: <A short 1-2 line description hook to capture attention>\n"
+    "YT_SUMMARY: <A concise 1-2 sentence summary of the Reddit post story>\n"
+    "YT_CATEGORY: <Appropriate YouTube category from: Comedy, Entertainment, Education, People & Blogs>\n"
+    "YT_CONTENT_TAGS: <5-8 content-specific tags/keywords, comma-separated, based on the story topic>"
 )
 
 

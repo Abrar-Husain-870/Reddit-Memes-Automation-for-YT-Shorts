@@ -134,6 +134,8 @@ def upload_short(
     video_path: Path,
     title: str,
     description: str = "",
+    tags: List[str] = None,
+    category_id: str = "22",
     privacy: str = "public",
     retries: int = 3
 ) -> str:
@@ -154,11 +156,7 @@ def upload_short(
         logger.error(f"Upload aborted: Daily upload limit reached ({config.MAX_VIDEOS_PER_DAY}/day)")
         return ""
 
-    # Build description and tags
     desc = description.strip()
-    if desc:
-        desc += "\n\n"
-    desc += _pick_hashtags(6)
 
     logger.info(f"Uploading short: {video_path.name}")
     logger.info(f"   Title: {title}")
@@ -175,8 +173,8 @@ def upload_short(
             "snippet": {
                 "title": title[:100],
                 "description": desc,
-                "tags": ["Reddit", "Shorts", "RedditStories", "AskReddit", "Satisfying"],
-                "categoryId": "22",  # People & Blogs or Entertainment
+                "tags": tags if tags else ["Reddit", "Shorts", "RedditStories", "AskReddit", "Satisfying"],
+                "categoryId": category_id,
             },
             "status": {
                 "privacyStatus": privacy,

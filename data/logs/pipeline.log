@@ -289,3 +289,51 @@ Emphasis: ['GUESS WHAT', 'MASTERPIECE', 'UNIQUE', 'EXQUISITE', 'COINCIDENCE', 'G
 2026-07-08 23:27:21,051 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
 2026-07-08 23:27:21,052 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
 2026-07-08 23:27:21,052 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
+2026-07-09 01:14:36,339 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-09 01:14:36,341 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 1 (Limit: 4)
+2026-07-09 01:14:36,341 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-09 01:14:36,341 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-09 01:14:36,341 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-09 01:14:36,342 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/tifu
+2026-07-09 01:14:36,343 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/tifu/top.json
+2026-07-09 01:14:36,739 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/tifu: 403 Client Error: Blocked for url: https://www.reddit.com/r/tifu/top.json?t=week
+2026-07-09 01:14:36,758 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/tifu/.rss
+2026-07-09 01:14:38,353 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/tifu - ID: 1upjoh2 - Title: TIFU By Accidentally Calling the Police to Work...
+2026-07-09 01:14:38,354 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 2.01s | Metadata: {'id': '1upjoh2', 'subreddit': 'tifu', 'title': 'TIFU By Accidentally Calling the Police ...'}
+2026-07-09 01:14:38,355 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Script Generation
+2026-07-09 01:14:40,787 [INFO] RedditShortsPipeline: Sending request to Groq model: llama-3.1-8b-instant
+2026-07-09 01:14:41,662 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-09 01:14:41,695 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Script Generation in 3.34s | Metadata: {'title': 'Phone Calls 911 in Hot Pocket', 'word_count': 35, 'emphasis_count': 4}
+2026-07-09 01:14:41,695 [INFO] RedditShortsPipeline: Generated Script Text:
+"My phone slipped from my pocket, bypassing my LOCK. It SWIPED to confirm, and then DIALED the EMS SOS line. I'm talking in front of my coworkers, trying to explain why the POLICE are here."
+Emphasis: ['LOCK', 'SWIPED', 'DIALED', 'POLICE']
+2026-07-09 01:14:41,704 [INFO] RedditShortsPipeline: Generating optimized metadata for Short...
+2026-07-09 01:14:41,704 [INFO] RedditShortsPipeline: Metadata generated successfully:
+2026-07-09 01:14:41,705 [INFO] RedditShortsPipeline:    Optimized Title: I Accidentally Called 911 Because My Phone Got TOO HOT!
+2026-07-09 01:14:41,705 [INFO] RedditShortsPipeline:    Category ID: 23
+2026-07-09 01:14:41,705 [INFO] RedditShortsPipeline:    Tags Count: 20
+2026-07-09 01:14:41,705 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Background Selection
+2026-07-09 01:14:41,708 [INFO] RedditShortsPipeline: Selected background clip: 'xwntkv3FfqA_clip_034.mp4' (used 0 times previously)
+2026-07-09 01:14:41,708 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Background Selection in 0.00s | Metadata: {'filename': 'xwntkv3FfqA_clip_034.mp4'}
+2026-07-09 01:14:41,708 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Overlay Generation
+2026-07-09 01:14:41,814 [INFO] RedditShortsPipeline: Reddit card overlay generated at C:\Users\husai\Desktop\Reddit YT Shorts\Brain_Bot\data\output\reddit_card.png (900x250)
+2026-07-09 01:14:41,815 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Overlay Generation in 0.11s | Metadata: {'path': 'C:\\Users\\husai\\Desktop\\Reddit YT Shorts\\Brain_Bot\\data\\output\\reddit_card.png'}
+2026-07-09 01:14:41,815 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Voice Synthesis
+2026-07-09 01:14:41,819 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-BrianNeural)
+2026-07-09 01:14:43,732 [ERROR] RedditShortsPipeline: Edge TTS synthesis error: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x000001569D200440> [The specified network name is no longer available]
+2026-07-09 01:14:43,732 [WARNING] RedditShortsPipeline: Configured TTS provider 'edge' failed: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x000001569D200440> [The specified network name is no longer available]. Falling back to Edge TTS.
+2026-07-09 01:14:43,733 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-AndrewNeural)
+2026-07-09 01:14:51,830 [INFO] RedditShortsPipeline: Generated Edge TTS voiceover: 11.98s (3 sentences)
+2026-07-09 01:14:51,831 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Voice Synthesis in 10.02s | Metadata: {'duration_s': 11.976, 'sentences': 3}
+2026-07-09 01:14:51,831 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Video Rendering
+2026-07-09 01:14:51,908 [INFO] RedditShortsPipeline: Rendering pipeline: Background 'xwntkv3FfqA_clip_034.mp4' | Audio duration: 11.98s
+2026-07-09 01:14:51,911 [INFO] RedditShortsPipeline: Running FFmpeg render (60 FPS, presets: medium, output: final_short.mp4)
+2026-07-09 01:15:28,307 [INFO] RedditShortsPipeline: ✔ Short rendered successfully: final_short.mp4 (11.35MB, 60fps)
+2026-07-09 01:15:28,307 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Video Rendering in 36.48s | Metadata: {'output_video': 'C:\\Users\\husai\\Desktop\\Reddit YT Shorts\\Brain_Bot\\data\\output\\final_short.mp4'}
+2026-07-09 01:15:28,308 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Database Update
+2026-07-09 01:15:28,310 [INFO] RedditShortsPipeline: Saved Reddit ID 1upjoh2 to history database
+2026-07-09 01:15:28,312 [INFO] RedditShortsPipeline: Updated background usage: xwntkv3FfqA_clip_034.mp4 has been used 1 time(s)
+2026-07-09 01:15:28,312 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Database Update in 0.00s
+2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
+2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
+2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: Cleaning up temporary render files...

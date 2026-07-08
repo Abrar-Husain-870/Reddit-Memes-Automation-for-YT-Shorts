@@ -23,7 +23,7 @@ class GroqProvider(BaseLLMProvider):
         post: RedditPost, 
         mode: str = "commentary", 
         style: str = "chaotic"
-    ) -> Tuple[str, str, List[str]]:
+    ) -> dict:
         if not self.client:
             raise ValueError("Groq client not initialized (missing API key)")
 
@@ -46,8 +46,7 @@ class GroqProvider(BaseLLMProvider):
             if not response:
                 raise ValueError("Received empty response from Groq")
                 
-            parsed = parse_structured_response(response, default_title=post.title)
-            return parsed["narration"], parsed["title"], parsed["emphasis"]
+            return parse_structured_response(response, default_title=post.title)
 
         except Exception as e:
             logger.error(f"Groq API error: {e}")

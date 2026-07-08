@@ -124,6 +124,9 @@ jobs:
           NARRATION_MODE: ${{ secrets.NARRATION_MODE }}
           YOUTUBE_PRIVACY: ${{ github.event.inputs.privacy || 'public' }}
 
+          # ── Metadata / Engagement Settings ──────────────────────────────
+          METADATA_MENTIONS: "@Abrar_husain"
+
         run: |
           # Build the command
           STYLE="${{ github.event.inputs.style || 'random' }}"

@@ -21,7 +21,7 @@ class GeminiProvider(BaseLLMProvider):
         post: RedditPost, 
         mode: str = "commentary", 
         style: str = "chaotic"
-    ) -> Tuple[str, str, List[str]]:
+    ) -> dict:
         try:
             import google.generativeai as genai
         except ImportError:
@@ -56,8 +56,7 @@ class GeminiProvider(BaseLLMProvider):
             if not response_text:
                 raise ValueError("Received empty response from Gemini")
 
-            parsed = parse_structured_response(response_text, default_title=post.title)
-            return parsed["narration"], parsed["title"], parsed["emphasis"]
+            return parse_structured_response(response_text, default_title=post.title)
 
         except Exception as e:
             logger.error(f"Gemini API error: {e}")

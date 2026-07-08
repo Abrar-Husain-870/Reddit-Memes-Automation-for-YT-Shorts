@@ -30,24 +30,24 @@ def generate_script_with_fallback(
     post: RedditPost, 
     mode: str = None, 
     style: str = None
-) -> Tuple[str, str, List[str]]:
+) -> dict:
     """
-    Generate narration script from a Reddit post.
+    Generate narration script and metadata from a Reddit post.
     Falls back to a clean reading of the post if the LLM provider fails.
     
     Returns:
-        Tuple of (narration, title, emphasis_words)
+        Dict containing script and metadata fields.
     """
     mode = mode or config.NARRATION_MODE
     style = style or config.CAPTION_STYLE
     
     try:
         provider = get_llm_provider()
-        narration, title, emphasis = provider.generate_narration(post, mode, style)
+        parsed = provider.generate_narration(post, mode, style)
         
         # Verify result is valid
-        if narration and len(narration.split()) >= 15:
-            return narration, title, emphasis
+        if parsed and parsed.get("narration") and len(parsed["narration"].split()) >= 15:
+            return parsed
         else:
             raise ValueError("Generated script is too short or empty")
             
@@ -69,4 +69,13 @@ def generate_script_with_fallback(
         emphasis = extract_emphasis_from_text(narration, limit=4)
         
         logger.info("Local fallback narration generated successfully")
-        return narration, title, emphasis
+        return {
+            "title": title,
+            "narration": narration,
+            "emphasis": emphasis,
+            "yt_title": "",
+            "yt_hook": "",
+            "yt_summary": "",
+            "yt_category": "",
+            "yt_content_tags": []
+        }

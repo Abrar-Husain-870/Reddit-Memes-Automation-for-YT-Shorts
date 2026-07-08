@@ -126,14 +126,29 @@ def main() -> None:
         # ── Step 2: Narration Scripting ──────────────────────
         log_stage_start("Script Generation")
         narration_mode = args.mode or config.NARRATION_MODE
-        narration, title, emphasis = generate_script_with_fallback(post, narration_mode, style)
+        script_data = generate_script_with_fallback(post, narration_mode, style)
+        narration = script_data["narration"]
+        caption_title = script_data["title"]
+        emphasis = script_data["emphasis"]
         
         log_stage_finish("Script Generation", {
-            "title": title,
+            "title": caption_title,
             "word_count": len(narration.split()),
             "emphasis_count": len(emphasis)
         })
         logger.info(f"Generated Script Text:\n{narration}\nEmphasis: {emphasis}")
+
+        # ── Step 2.5: Optimize Metadata for Engagement ───────
+        from src.upload.metadata import generate_optimized_metadata
+        optimized_meta = generate_optimized_metadata(
+            post=post,
+            narration=narration,
+            llm_title=script_data.get("yt_title", ""),
+            llm_hook=script_data.get("yt_hook", ""),
+            llm_summary=script_data.get("yt_summary", ""),
+            llm_category=script_data.get("yt_category", ""),
+            llm_content_tags=script_data.get("yt_content_tags", [])
+        )
 
         # ── Step 3: Background Clip Selection ────────────────
         log_stage_start("Background Selection")
@@ -200,13 +215,12 @@ def main() -> None:
         if not args.no_upload:
             log_stage_start("YouTube Upload")
             
-            # Formulate descriptions
-            desc_body = f"Reddit story from r/{post.subreddit}.\n\nOriginal title: {post.title}"
-            
             video_id = upload_short(
                 video_path=video_path,
-                title=title,
-                description=desc_body,
+                title=optimized_meta["title"],
+                description=optimized_meta["description"],
+                tags=optimized_meta["tags"],
+                category_id=optimized_meta["category_id"],
                 privacy=args.privacy
             )
             
@@ -223,7 +237,7 @@ def main() -> None:
         print("=" * 70)
         print("=== INSTAGRAM MANUAL UPLOAD GUIDE ===")
         print("=" * 70)
-        print(f"Post Description:\n{title}\n\nReddit story from r/{post.subreddit} #reddit #shorts\n")
+        print(f"Post Description:\n{optimized_meta['description']}\n")
         print(f"Video File: {video_path}")
         print("=" * 70)
 

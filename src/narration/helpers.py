@@ -44,15 +44,17 @@ def extract_emphasis_from_text(text: str, limit: int = 5) -> List[str]:
 
 def parse_structured_response(response: str, default_title: str = "Reddit Story") -> Dict[str, any]:
     """
-    Parses structured responses containing:
-    TITLE: <title>
-    NARRATION: <script>
-    EMPHASIS: <comma-separated words>
+    Parses structured responses containing script and metadata tags.
     """
     result = {
         "title": default_title,
         "narration": "",
-        "emphasis": []
+        "emphasis": [],
+        "yt_title": "",
+        "yt_hook": "",
+        "yt_summary": "",
+        "yt_category": "",
+        "yt_content_tags": []
     }
     
     lines = response.splitlines()
@@ -75,10 +77,32 @@ def parse_structured_response(response: str, default_title: str = "Reddit Story"
             raw_emp = line_strip.split(":", 1)[1].strip()
             result["emphasis"] = [w.strip().upper() for w in raw_emp.split(",") if w.strip()]
             current_field = "emphasis"
+        elif upper_line.startswith("YT_TITLE:"):
+            result["yt_title"] = line_strip.split(":", 1)[1].strip()
+            current_field = "yt_title"
+        elif upper_line.startswith("YT_HOOK:"):
+            result["yt_hook"] = line_strip.split(":", 1)[1].strip()
+            current_field = "yt_hook"
+        elif upper_line.startswith("YT_SUMMARY:"):
+            result["yt_summary"] = line_strip.split(":", 1)[1].strip()
+            current_field = "yt_summary"
+        elif upper_line.startswith("YT_CATEGORY:"):
+            result["yt_category"] = line_strip.split(":", 1)[1].strip()
+            current_field = "yt_category"
+        elif upper_line.startswith("YT_CONTENT_TAGS:"):
+            raw_tags = line_strip.split(":", 1)[1].strip()
+            result["yt_content_tags"] = [t.strip() for t in raw_tags.split(",") if t.strip()]
+            current_field = "yt_content_tags"
         elif current_field == "narration":
             narration_lines.append(line_strip)
         elif current_field == "title":
             result["title"] += " " + line_strip
+        elif current_field == "yt_title":
+            result["yt_title"] += " " + line_strip
+        elif current_field == "yt_hook":
+            result["yt_hook"] += " " + line_strip
+        elif current_field == "yt_summary":
+            result["yt_summary"] += " " + line_strip
             
     result["narration"] = " ".join([l for l in narration_lines if l]).strip()
     
@@ -90,6 +114,9 @@ def parse_structured_response(response: str, default_title: str = "Reddit Story"
     # Clean up formatting
     result["narration"] = strip_markdown(strip_emojis(result["narration"]))
     result["title"] = strip_markdown(strip_emojis(result["title"]))
+    result["yt_title"] = strip_markdown(strip_emojis(result["yt_title"]))
+    result["yt_hook"] = strip_markdown(strip_emojis(result["yt_hook"]))
+    result["yt_summary"] = strip_markdown(strip_emojis(result["yt_summary"]))
     
     # Generate fallback emphasis if none was specified
     if not result["emphasis"]:

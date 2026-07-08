@@ -12,9 +12,9 @@ class BaseLLMProvider(ABC):
         post: RedditPost, 
         mode: str = "commentary", 
         style: str = "chaotic"
-    ) -> Tuple[str, str, List[str]]:
+    ) -> dict:
         """
-        Generate narration script from a Reddit post.
+        Generate narration script and metadata from a Reddit post.
         
         Args:
             post: The RedditPost dataclass instance.
@@ -22,6 +22,6 @@ class BaseLLMProvider(ABC):
             style: Presentation style ('chaotic', 'meme', 'story', 'npc').
             
         Returns:
-            Tuple of (full_narration_text, clickbait_title, emphasis_words_list)
+            Dict containing 'narration', 'title', 'emphasis', and YouTube metadata fields.
         """
         pass

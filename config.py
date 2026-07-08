@@ -160,6 +160,11 @@ YT_CLIENT_SECRET = _env("YT_CLIENT_SECRET_VALUE")
 YT_REFRESH_TOKEN = _env("YT_REFRESH_TOKEN")
 YT_PRIVACY = _env("YOUTUBE_PRIVACY", "public")
 
+# Engagement Metadata Customizations
+METADATA_MENTIONS = _env("METADATA_MENTIONS", "")
+METADATA_TRENDING_TAGS = _env("METADATA_TRENDING_TAGS", "viral, fyp, shortvideo, story, dailycontent, interesting, mustwatch")
+METADATA_DISCLAIMER = _env("METADATA_DISCLAIMER", "Narration is an AI-generated retelling and commentary of this story.")
+
 # ── Scheduler & Limits ───────────────────────────────────────
 MAX_VIDEOS_PER_DAY = int(_env("MAX_VIDEOS_PER_DAY", "4"))
 UPLOAD_SCHEDULE_TIMES = [
