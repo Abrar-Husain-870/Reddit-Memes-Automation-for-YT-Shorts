@@ -184,3 +184,12 @@ IG_PASSWORD = _env("IG_PASSWORD", "")
 ENABLE_CONTENT_SAFETY = _env_bool("ENABLE_CONTENT_SAFETY", True)
 SAFETY_MODE = _env("SAFETY_MODE", "strict").lower().strip()  # strict, standard, lenient
 MAX_ALLOWED_RISK = _env("MAX_ALLOWED_RISK", "low").lower().strip()  # safe, low, medium, high
+
+# ── Cat Reaction Settings ───────────────────────────────────
+CAT_REACTION_FOLDER = ROOT / _env("CAT_REACTION_FOLDER", "data/assets/cat_reactions")
+CAT_LAYOUT_HEIGHT = float(_env("CAT_LAYOUT_HEIGHT", "0.25"))
+MEME_LAYOUT_HEIGHT = float(_env("MEME_LAYOUT_HEIGHT", "0.75"))
+ENABLE_CAT_REACTIONS = _env_bool("ENABLE_CAT_REACTIONS", True)
+CAT_SELECTION_MODE = _env("CAT_SELECTION_MODE", "random")
+CAT_AVOID_REPEAT = _env_bool("CAT_AVOID_REPEAT", True)
+CAT_HISTORY_FILE = CACHE_DIR / "cat_history.json"

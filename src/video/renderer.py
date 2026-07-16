@@ -92,11 +92,14 @@ def _build_word_timings(
 def _build_ass_subtitles(
     timings: List[Tuple[float, float, str]],
     style: str = "chaotic",
-    emphasis_words: List[str] | None = None
+    emphasis_words: List[str] | None = None,
+    alternate_y: List[int] | None = None
 ) -> str:
     """Build ASS formatted subtitle content with word popping effects."""
     palette = STYLE_PALETTES.get(style, STYLE_PALETTES["chaotic"])
     emphasis_set = set(w.upper() for w in (emphasis_words or []))
+    
+    y_list = alternate_y if alternate_y is not None else ALTERNATE_Y
 
     # Font sizes: 90pt normal, 130pt emphasis (1.5x)
     ass = (
@@ -119,8 +122,8 @@ def _build_ass_subtitles(
         is_emphasis = word_clean in emphasis_set
         style_name = "Emphasis" if is_emphasis else "Normal"
         color = palette[i % len(palette)]
-        alt_idx = i % len(ALTERNATE_Y)
-        y_margin = ALTERNATE_Y[alt_idx]
+        alt_idx = i % len(y_list)
+        y_margin = y_list[alt_idx]
         
         # Word popping animation: start 1.25x larger and scale down to 1x over 100ms
         pop_effect = "\\fscx125\\fscy125\\t(0,100,\\fscx100,\\fscy100)"
@@ -134,6 +137,47 @@ def _build_ass_subtitles(
     return ass
 
 
+def _get_video_dimensions(path: Path) -> Tuple[int, int]:
+    """Get video width and height using ffprobe."""
+    cmd = [
+        "ffprobe", "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=s=x:p=0",
+        str(path)
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=FFPROBE_TIMEOUT)
+    out = r.stdout.strip()
+    if not out:
+        raise ValueError(f"Empty ffprobe output for {path}")
+    line = out.split()[0] if out.split() else out
+    w, h = map(int, line.split('x'))
+    return w, h
+
+
+def _get_image_dimensions(path: Path) -> Tuple[int, int]:
+    """Get image width and height using ffprobe."""
+    cmd = [
+        "ffprobe", "-v", "error",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=s=x:p=0",
+        str(path)
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=FFPROBE_TIMEOUT)
+    out = r.stdout.strip()
+    if not out:
+        raise ValueError(f"Empty ffprobe output for {path}")
+    line = out.split()[0] if out.split() else out
+    w, h = map(int, line.split('x'))
+    return w, h
+
+
+def make_even(val: float) -> int:
+    """Helper to ensure dimensions/offsets are even integers (required by FFmpeg)."""
+    v = int(round(val))
+    return v if v % 2 == 0 else v + 1
+
+
 def render_short(
     clip_path: Path,
     audio_path: Path,
@@ -142,7 +186,8 @@ def render_short(
     output_path: Path | None = None,
     sentence_timings: List[dict] | None = None,
     style: str = "chaotic",
-    emphasis_words: List[str] | None = None
+    emphasis_words: List[str] | None = None,
+    is_cat_clip: bool = False
 ) -> Path:
     """Render a fully customized 9:16 vertical Short at 60 FPS."""
     if output_path is None:
@@ -152,83 +197,187 @@ def render_short(
     
     # Get audio duration to sync video cut length
     audio_dur = _get_audio_duration(audio_path)
-    logger.info(f"Rendering pipeline: Background '{clip_path.name}' | Audio duration: {audio_dur:.2f}s")
+    
+    # Calculate exact video duration: 2.0s padding at start, 3.0s reading silence at end
+    render_duration = min(59.0, audio_dur + 2.0 + 3.0)
+    logger.info(f"Rendering pipeline: Background '{clip_path.name}' | Audio duration: {audio_dur:.2f}s | Target Short duration: {render_duration:.2f}s")
     
     # Clean narration string
     clean_narration = narration.replace("**", "").replace("__", "").replace("*", "")
     clean_narration = re.sub(r'[^\w\s\'",.!?;:\-]', "", clean_narration).strip()
     words = [w for w in clean_narration.split() if w.strip()]
     
+    # Base layout dimensions
+    target_meme_h = 1440
+    target_cat_h = 480
+    y_list = None
+    
+    # Adaptive Aspect Ratio calculations for Cat Reactions layout
+    if is_cat_clip and overlay_card_path and overlay_card_path.exists():
+        # Get Meme Image dimensions
+        mw, mh = 1080, 1080
+        try:
+            mw, mh = _get_image_dimensions(overlay_card_path)
+        except Exception as e:
+            logger.warning(f"Failed to read image dimensions for {overlay_card_path}: {e}. Using default square.")
+        mar = mw / mh
+        
+        # Get Cat Reaction video dimensions
+        cw, ch = 1920, 1080
+        try:
+            cw, ch = _get_video_dimensions(clip_path)
+        except Exception as e:
+            logger.warning(f"Failed to read video dimensions for {clip_path}: {e}. Using default landscape.")
+        car = cw / ch
+        
+        # Determine the target proportions dynamically
+        target_meme_h_raw = config.MEME_LAYOUT_HEIGHT * 1920
+        target_cat_h_raw = config.CAT_LAYOUT_HEIGHT * 1920
+        
+        if mar > 1.2 and car < 0.9:  # Landscape meme + Portrait cat (make cat taller, meme shorter)
+            target_meme_h_raw = 0.65 * 1920
+            target_cat_h_raw = 0.35 * 1920
+        elif mar < 0.8 and car > 1.2:  # Portrait meme + Landscape cat (make meme taller, cat shorter)
+            target_meme_h_raw = 0.80 * 1920
+            target_cat_h_raw = 0.20 * 1920
+            
+        target_meme_h = make_even(target_meme_h_raw)
+        target_cat_h = make_even(target_cat_h_raw)
+        
+        # Calculate optimal scale bounds for meme to fit inside (1080 x target_meme_h)
+        scale_w_meme = 1080
+        scale_h_meme = int(1080 / mar)
+        if scale_h_meme > target_meme_h:
+            scale_h_meme = target_meme_h
+            scale_w_meme = int(target_meme_h * mar)
+        scale_w_meme = make_even(scale_w_meme)
+        scale_h_meme = make_even(scale_h_meme)
+        
+        # Calculate optimal scale bounds for cat video to fit inside (1080 x target_cat_h)
+        scale_w_cat = 1080
+        scale_h_cat = int(1080 / car)
+        if scale_h_cat > target_cat_h:
+            scale_h_cat = target_cat_h
+            scale_w_cat = int(target_cat_h * car)
+        scale_w_cat = make_even(scale_w_cat)
+        scale_h_cat = make_even(scale_h_cat)
+        
+        # Calculate subtitle centers to reside inside the cat section
+        cat_center_y = target_meme_h + (target_cat_h / 2)
+        y_list = [
+            make_even(cat_center_y - 30),
+            make_even(cat_center_y),
+            make_even(cat_center_y + 30),
+            make_even(cat_center_y - 15),
+            make_even(cat_center_y + 15)
+        ]
+        
     # Map timestamps and build subtitle ASS file
     timings = _build_word_timings(words, audio_dur, sentence_timings)
-    ass_content = _build_ass_subtitles(timings, style, emphasis_words)
+    ass_content = _build_ass_subtitles(timings, style, emphasis_words, alternate_y=y_list)
     
     # Save ASS captions
     ass_path = config.OUTPUT_DIR / "captions.ass"
     ass_path.write_text(ass_content, encoding="utf-8")
     
-    # To fix Windows path issues with FFmpeg subtitles filter:
-    # Use relative path prefix or escape backslashes
+    # Escape path prefix for FFmpeg subtitles filter
     ass_safe_path = "data/output/captions.ass"
-    
-    # Assemble inputs (loop video clip infinitely in case it is shorter than narration audio)
-    inputs = [
-        "-stream_loop", "-1",
-        "-i", str(clip_path),
-        "-i", str(audio_path)
-    ]
     
     # Filter Complex Building
     filter_chains = []
     
-    # 1. Base background scaling and formatting
-    if config.OVERLAY_BACKGROUND_BLUR:
-        # Create a blurred background layer, scale foreground over it
+    if is_cat_clip and overlay_card_path and overlay_card_path.exists():
+        # Setup 3 inputs: cat video, narration audio, meme image
+        inputs = [
+            "-stream_loop", "-1",
+            "-i", str(clip_path),
+            "-i", str(audio_path),
+            "-i", str(overlay_card_path)
+        ]
+        
+        # 1. Composite Cat Box (blurred background + centered scaled foreground)
         filter_chains.append(
-            "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=25:5[bg]"
+            f"[0:v]scale=1080:{target_cat_h}:force_original_aspect_ratio=increase,crop=1080:{target_cat_h},boxblur=20:5[cat_bg]"
         )
         filter_chains.append(
-            "[0:v]scale=1080:-1[fg_scaled]"
+            f"[0:v]scale={scale_w_cat}:{scale_h_cat}[cat_fg]"
         )
         filter_chains.append(
-            "[bg][fg_scaled]overlay=x=0:y=(1920-h)/2[v_base]"
+            f"[cat_bg][cat_fg]overlay=x=(1080-w)/2:y=({target_cat_h}-h)/2[cat_box]"
         )
+        
+        # 2. Composite Meme Box (blurred background + centered scaled foreground + float bobbing animation)
+        filter_chains.append(
+            f"[2:v]scale=1080:{target_meme_h}:force_original_aspect_ratio=increase,crop=1080:{target_meme_h},boxblur=30:5[meme_bg]"
+        )
+        filter_chains.append(
+            f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_fg]"
+        )
+        filter_chains.append(
+            f"[meme_bg][meme_fg]overlay=x=(1080-w)/2:y='({target_meme_h}-h)/2 + 10*sin(2*PI*t/3.0)'[meme_box]"
+        )
+        
+        # 3. Stack Meme Box (top) and Cat Box (bottom)
+        filter_chains.append(
+            f"[meme_box][cat_box]overlay=x=0:y={target_meme_h}[v_layout]"
+        )
+        last_v_tag = "v_layout"
+        
     else:
-        # Standard scale and crop to 9:16
-        filter_chains.append(
-            "[0:v]scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920,unsharp=5:5:1.0:5:5:0.0[v_base]"
-        )
+        # Fallback to standard gameplay background composition (2 inputs)
+        inputs = [
+            "-stream_loop", "-1",
+            "-i", str(clip_path),
+            "-i", str(audio_path)
+        ]
         
-    last_v_tag = "v_base"
-    
-    # 2. Add Meme Image Centered Overlay
-    if overlay_card_path and overlay_card_path.exists():
-        inputs.extend(["-i", str(overlay_card_path)])
-        filter_chains.append(
-            "[2:v]scale=w='min(1000,iw)':h='min(1400,ih)':force_original_aspect_ratio=decrease[meme_scaled]"
-        )
-        filter_chains.append(
-            f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y=(1920-h)/2[v_meme]"
-        )
-        last_v_tag = "v_meme"
+        if config.OVERLAY_BACKGROUND_BLUR:
+            # Create a blurred background layer, scale foreground over it
+            filter_chains.append(
+                "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=25:5[bg]"
+            )
+            filter_chains.append(
+                "[0:v]scale=1080:-1[fg_scaled]"
+            )
+            filter_chains.append(
+                "[bg][fg_scaled]overlay=x=0:y=(1920-h)/2[v_base]"
+            )
+        else:
+            # Standard scale and crop to 9:16
+            filter_chains.append(
+                "[0:v]scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920,unsharp=5:5:1.0:5:5:0.0[v_base]"
+            )
+            
+        last_v_tag = "v_base"
         
-    # 3. Add captions
+        # Add Meme Image Centered Overlay
+        if overlay_card_path and overlay_card_path.exists():
+            inputs.extend(["-i", str(overlay_card_path)])
+            filter_chains.append(
+                "[2:v]scale=w='min(1000,iw)':h='min(1400,ih)':force_original_aspect_ratio=decrease[meme_scaled]"
+            )
+            filter_chains.append(
+                f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y=(1920-h)/2[v_meme]"
+            )
+            last_v_tag = "v_meme"
+            
+    # 4. Add captions overlay
     filter_chains.append(
         f"[{last_v_tag}]subtitles={ass_safe_path}[v_sub]"
     )
     last_v_tag = "v_sub"
     
-    # 4. Optional Progress Bar (Draw box dynamically changing width over 12 seconds)
+    # 5. Draw Progress Bar (synced to exact render duration)
     if config.OVERLAY_PROGRESS_BAR:
         progress_color = "0xFF5500"  # Orange
         bar_y = 1880
         bar_height = 12
         filter_chains.append(
-            f"[{last_v_tag}]drawbox=x=0:y={bar_y}:w='1080*t/12.00':h={bar_height}:color={progress_color}@0.9:t=fill[v_final]"
+            f"[{last_v_tag}]drawbox=x=0:y={bar_y}:w='1080*t/{render_duration:.2f}':h={bar_height}:color={progress_color}@0.9:t=fill[v_final]"
         )
         last_v_tag = "v_final"
         
-    # 5. Delay audio by 2000ms
+    # 6. Delay audio by 2000ms
     filter_chains.append(
         "[1:a]adelay=2000|2000[delayed_audio]"
     )
@@ -253,12 +402,12 @@ def render_short(
         "-c:a", "aac",
         "-b:a", "256k",
         "-ar", "48000",
-        "-t", "12.00",
+        "-t", f"{render_duration:.2f}",
         "-movflags", "+faststart",
         str(output_path)
     ])
     
-    logger.info(f"Running FFmpeg render (60 FPS, presets: medium, output: {output_path.name})")
+    logger.info(f"Running FFmpeg render (60 FPS, preset: medium, output: {output_path.name})")
     
     try:
         r = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=RENDER_TIMEOUT)
@@ -275,3 +424,4 @@ def render_short(
         return output_path
     else:
         raise FileNotFoundError("Rendered video file not found after FFmpeg completion")
+

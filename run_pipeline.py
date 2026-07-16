@@ -28,6 +28,7 @@ from src.video import (
     get_background_clip,
     increment_background_usage,
     render_short,
+    get_cat_reaction_clip,
 )
 from src.upload import upload_short, check_scheduler_run
 
@@ -253,15 +254,28 @@ def main() -> None:
             log_stage_error("Reddit Ingestion", error_msg, fatal=True)
             sys.exit(1)
 
-        # ── Step 3: Background Clip Selection ────────────────
+        # ── Step 3: Background / Cat Clip Selection ──────────
         log_stage_start("Background Selection")
-        bg_clip = get_background_clip(skip_download=args.skip_download)
+        bg_clip = None
+        is_cat_clip = False
+        
+        if config.ENABLE_CAT_REACTIONS:
+            bg_clip = get_cat_reaction_clip()
+            if bg_clip:
+                is_cat_clip = True
+                logger.info(f"Using cat reaction clip: {bg_clip.name}")
+            else:
+                logger.warning("ENABLE_CAT_REACTIONS is True but no cat clips found. Falling back to gameplay background.")
+                
+        if not bg_clip:
+            bg_clip = get_background_clip(skip_download=args.skip_download)
+            
         if not bg_clip or not bg_clip.exists():
-            error_msg = "Could not retrieve background video clip"
+            error_msg = "Could not retrieve background / cat video clip"
             log_stage_error("Background Selection", error_msg, fatal=True)
             sys.exit(1)
 
-        log_stage_finish("Background Selection", {"filename": bg_clip.name})
+        log_stage_finish("Background Selection", {"filename": bg_clip.name, "is_cat": is_cat_clip})
 
         # ── Step 4: Overlay Selection ────────────────────────
         log_stage_start("Overlay Selection")
@@ -292,7 +306,8 @@ def main() -> None:
                 output_path=video_path,
                 sentence_timings=sentence_timings,
                 style=style,
-                emphasis_words=emphasis
+                emphasis_words=emphasis,
+                is_cat_clip=is_cat_clip
             )
             log_stage_finish("Video Rendering", {"output_video": str(video_path)})
         except Exception as e:
@@ -302,7 +317,8 @@ def main() -> None:
         # ── Step 7: Update Databases ─────────────────────────
         log_stage_start("Database Update")
         save_processed_id(post.id)
-        increment_background_usage(bg_clip.name)
+        if not is_cat_clip:
+            increment_background_usage(bg_clip.name)
         log_stage_finish("Database Update")
 
         # ── Step 8: Upload YouTube Shorts ────────────────────
