@@ -3,6 +3,7 @@ import random
 import time
 import urllib.request
 import urllib.parse
+from pathlib import Path
 from typing import List, Set, Optional
 import requests
 
@@ -127,7 +128,8 @@ def _fetch_with_praw(subreddit: str, sort: str, time_filter: str) -> List[dict]:
                 "permalink": post.permalink,
                 "author": post.author.name if post.author else "[deleted]",
                 "pinned": getattr(post, "pinned", False),
-                "crosspost_parent": getattr(post, "crosspost_parent", None)
+                "crosspost_parent": getattr(post, "crosspost_parent", None),
+                "url": getattr(post, "url", "")
             })
         return posts
     except Exception as e:
@@ -139,13 +141,26 @@ def _fetch_with_rss(subreddit: str) -> List[dict]:
     """Fetch posts via public RSS feeds as a third fallback."""
     import xml.etree.ElementTree as ET
     import html.parser
+    import re as _re
     
     class HTMLTextExtractor(html.parser.HTMLParser):
         def __init__(self):
             super().__init__()
             self.text = []
+            self.images = []      # <img src="..."> URLs
+            self.link_hrefs = []  # <a href="..."> URLs
         def handle_data(self, data):
             self.text.append(data)
+        def handle_starttag(self, tag, attrs):
+            attrs_dict = dict(attrs)
+            if tag == "img":
+                src = attrs_dict.get("src", "")
+                if src:
+                    self.images.append(src)
+            elif tag == "a":
+                href = attrs_dict.get("href", "")
+                if href:
+                    self.link_hrefs.append(href)
         def get_text(self):
             return "".join(self.text)
 
@@ -186,6 +201,42 @@ def _fetch_with_rss(subreddit: str) -> List[dict]:
             extractor.feed(html_content)
             selftext = extractor.get_text().strip()
             
+            # Extract image URL from RSS HTML content.
+            # RSS structure: <a href="https://i.redd.it/xxx.jpeg">[link]</a>
+            #                <img src="https://preview.redd.it/xxx.jpeg?width=320&...">
+            # Priority: i.redd.it (direct, downloadable) > i.imgur.com > preview.redd.it (often 403)
+            image_url = ""
+            valid_img_extensions = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
+            
+            # 1) Check <a> href tags first — these contain the real i.redd.it URLs
+            for href in extractor.link_hrefs:
+                href_lower = href.lower().split("?")[0]  # strip query params
+                if ("i.redd.it" in href_lower or "i.imgur.com" in href_lower):
+                    if any(href_lower.endswith(ext) for ext in valid_img_extensions):
+                        image_url = href.split("?")[0]  # clean URL without query params
+                        break
+            
+            # 2) Fallback: regex scan for i.redd.it or i.imgur.com direct links in raw HTML
+            if not image_url:
+                direct_patterns = _re.findall(
+                    r'https?://(?:i\.redd\.it|i\.imgur\.com)/[^\s"<>?]+?(?:\.jpg|\.jpeg|\.png|\.webp|\.gif)',
+                    html_content,
+                    _re.IGNORECASE
+                )
+                if direct_patterns:
+                    image_url = direct_patterns[0]
+            
+            # 3) Last resort: use preview.redd.it thumbnail (may 403 but worth trying)
+            if not image_url:
+                for img_src in extractor.images:
+                    img_clean = img_src.lower().split("?")[0]
+                    if any(img_clean.endswith(ext) for ext in valid_img_extensions):
+                        image_url = img_src.split("?")[0]
+                        break
+            
+            # Determine if this is an image post based on whether we found an image URL
+            is_self = not bool(image_url)
+            
             # RSS has no score/comments. Fake values above config minimums to pass filters.
             posts.append({
                 "id": post_id_val,
@@ -195,11 +246,12 @@ def _fetch_with_rss(subreddit: str) -> List[dict]:
                 "score": config.REDDIT_MIN_SCORE + 100,
                 "num_comments": config.REDDIT_MIN_COMMENTS + 10,
                 "over_18": False,
-                "is_self": True,
+                "is_self": is_self,
                 "permalink": permalink,
                 "author": author,
                 "pinned": False,
-                "crosspost_parent": None
+                "crosspost_parent": None,
+                "url": image_url
             })
         return posts
     except Exception as e:
@@ -232,7 +284,8 @@ def fetch_posts(subreddit: str, sort: str = "top", time_filter: str = "week") ->
                 permalink=rp.get("permalink", ""),
                 author=rp.get("author", rp.get("author_fullname", "[deleted]")),
                 pinned=rp.get("pinned", False),
-                crosspost_parent=rp.get("crosspost_parent")
+                crosspost_parent=rp.get("crosspost_parent"),
+                media_url=rp.get("url", "")
             )
         )
     return posts
@@ -255,24 +308,22 @@ def filter_post(post: RedditPost, processed_ids: Set[str]) -> Optional[str]:
     if config.REDDIT_FILTER_CROSSPOSTS and post.crosspost_parent:
         return "Crosspost"
         
-    if not post.is_self:
-        return "Not a self/text post (e.g. image/link)"
+    if post.is_self:
+        return "Self/text post (memes must be images)"
 
-    # Check for deleted/removed content
-    cleaned_body = post.selftext.strip()
-    if cleaned_body in ("[deleted]", "[removed]", ""):
-        if not post.title:
-            return "Deleted / Empty content"
-            
-    # Combine title and text for length calculations
-    total_text = f"{post.title}\n{post.selftext}"
-    text_len = len(total_text)
-    
-    if text_len < config.REDDIT_POST_MIN_LEN:
-        return f"Post too short ({text_len} chars < {config.REDDIT_POST_MIN_LEN})"
+    # Ensure the post URL ends with a valid image extension: .jpg, .jpeg, .png, .webp, .gif.
+    if not post.media_url:
+        return "No media URL found"
         
-    if text_len > config.REDDIT_POST_MAX_LEN:
-        return f"Post too long ({text_len} chars > {config.REDDIT_POST_MAX_LEN})"
+    from urllib.parse import urlparse
+    parsed = urlparse(post.media_url.lower())
+    valid_extensions = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
+    if not parsed.path.endswith(valid_extensions):
+        return f"Media URL does not point to a valid image: {post.media_url}"
+
+    # For image posts, we just need a title
+    if not post.title:
+        return "No title"
         
     if post.score < config.REDDIT_MIN_SCORE:
         return f"Score too low ({post.score} < {config.REDDIT_MIN_SCORE})"
@@ -281,6 +332,35 @@ def filter_post(post: RedditPost, processed_ids: Set[str]) -> Optional[str]:
         return f"Comment count too low ({post.num_comments} < {config.REDDIT_MIN_COMMENTS})"
         
     return None
+
+
+def download_meme_image(url: str) -> Path:
+    """Downloads the meme image from the given URL and saves it to data/output/."""
+    logger.info(f"Downloading meme image from URL: {url}")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "Referer": "https://www.reddit.com/",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    response = requests.get(url, headers=headers, timeout=30)
+    response.raise_for_status()
+    
+    # Determine file extension from URL
+    from urllib.parse import urlparse
+    parsed = urlparse(url)
+    ext = Path(parsed.path).suffix.lower()
+    if ext not in ('.jpg', '.jpeg', '.png', '.webp', '.gif'):
+        ext = '.png'
+    
+    # Ensure OUTPUT_DIR exists
+    config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_path = config.OUTPUT_DIR / f"meme_image{ext}"
+    with open(out_path, "wb") as f:
+        f.write(response.content)
+        
+    logger.info(f"Meme image successfully saved to {out_path} ({len(response.content)} bytes)")
+    return out_path
 
 
 def get_random_reddit_post() -> Optional[RedditPost]:
@@ -298,8 +378,8 @@ def get_random_reddit_post() -> Optional[RedditPost]:
     
     for i, sub in enumerate(subreddits):
         if i > 0:
-            logger.info("Pausing for 2.0s to respect Reddit rate limits...")
-            time.sleep(2.0)
+            logger.info("Pausing for 5.0s to respect Reddit rate limits...")
+            time.sleep(5.0)
             
         logger.info(f"Searching subreddits for posts: r/{sub}")
         posts = fetch_posts(sub, config.REDDIT_SORT, config.REDDIT_TIME_FILTER)

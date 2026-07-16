@@ -46,7 +46,7 @@ def generate_script_with_fallback(
         parsed = provider.generate_narration(post, mode, style)
         
         # Verify result is valid
-        if parsed and parsed.get("narration") and len(parsed["narration"].split()) >= 15:
+        if parsed and parsed.get("narration") and len(parsed["narration"].split()) >= 5:
             return parsed
         else:
             raise ValueError("Generated script is too short or empty")

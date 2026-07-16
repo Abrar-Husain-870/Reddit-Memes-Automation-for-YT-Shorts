@@ -125,7 +125,11 @@ def _build_ass_subtitles(
         # Word popping animation: start 1.25x larger and scale down to 1x over 100ms
         pop_effect = "\\fscx125\\fscy125\\t(0,100,\\fscx100,\\fscy100)"
         
-        ass += f"Dialogue: 0,{_t(ts)},{_t(te)},{style_name},,0,0,{y_margin},,{{\\c{color}\\an5{pop_effect}}}{w}\n"
+        # Shift timings forward by 2.0 seconds
+        ts_shifted = ts + 2.0
+        te_shifted = te + 2.0
+        
+        ass += f"Dialogue: 0,{_t(ts_shifted)},{_t(te_shifted)},{style_name},,0,0,{y_margin},,{{\\c{color}\\an5{pop_effect}}}{w}\n"
 
     return ass
 
@@ -197,15 +201,16 @@ def render_short(
         
     last_v_tag = "v_base"
     
-    # 2. Add Reddit card overlay if provided
-    if config.OVERLAY_REDDIT_SCREENSHOT and overlay_card_path and overlay_card_path.exists():
+    # 2. Add Meme Image Centered Overlay
+    if overlay_card_path and overlay_card_path.exists():
         inputs.extend(["-i", str(overlay_card_path)])
-        # overlay is card (input index 2)
-        # Position card in upper middle (y=300)
         filter_chains.append(
-            f"[{last_v_tag}][2:v]overlay=x=(1080-w)/2:y=300[v_card]"
+            "[2:v]scale=w='min(1000,iw)':h='min(1400,ih)':force_original_aspect_ratio=decrease[meme_scaled]"
         )
-        last_v_tag = "v_card"
+        filter_chains.append(
+            f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y=(1920-h)/2[v_meme]"
+        )
+        last_v_tag = "v_meme"
         
     # 3. Add captions
     filter_chains.append(
@@ -213,15 +218,20 @@ def render_short(
     )
     last_v_tag = "v_sub"
     
-    # 4. Optional Progress Bar (Draw box dynamically changing width)
+    # 4. Optional Progress Bar (Draw box dynamically changing width over 12 seconds)
     if config.OVERLAY_PROGRESS_BAR:
         progress_color = "0xFF5500"  # Orange
         bar_y = 1880
         bar_height = 12
         filter_chains.append(
-            f"[{last_v_tag}]drawbox=x=0:y={bar_y}:w='1080*t/{audio_dur:.2f}':h={bar_height}:color={progress_color}@0.9:t=fill[v_final]"
+            f"[{last_v_tag}]drawbox=x=0:y={bar_y}:w='1080*t/12.00':h={bar_height}:color={progress_color}@0.9:t=fill[v_final]"
         )
         last_v_tag = "v_final"
+        
+    # 5. Delay audio by 2000ms
+    filter_chains.append(
+        "[1:a]adelay=2000|2000[delayed_audio]"
+    )
         
     filter_complex_str = ";".join(filter_chains)
     
@@ -233,7 +243,7 @@ def render_short(
     cmd.extend([
         "-filter_complex", filter_complex_str,
         "-map", f"[{last_v_tag}]",
-        "-map", "1:a",
+        "-map", "[delayed_audio]",
         "-c:v", "libx264",
         "-r", str(config.RENDER_FPS),
         "-preset", "medium",
@@ -243,7 +253,7 @@ def render_short(
         "-c:a", "aac",
         "-b:a", "256k",
         "-ar", "48000",
-        "-t", f"{audio_dur:.2f}",
+        "-t", "12.00",
         "-movflags", "+faststart",
         str(output_path)
     ])

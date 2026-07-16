@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Reddit to Shorts Automation Pipeline — Master Orchestrator.
-Parses settings, coordinates ingestion, narration, voiceover, rendering, and upload.
+Meme Shorts Automation Pipeline — Master Orchestrator.
+Ingests image memes from Reddit, generates short commentary, synthesizes voiceover,
+renders 12-second vertical shorts with centred meme overlay, and uploads to YouTube.
 Robust error handling ensures the pipeline completes even if APIs fail.
 """
 from __future__ import annotations
@@ -26,7 +27,6 @@ from src.voice import synthesize_voiceover_with_fallback
 from src.video import (
     get_background_clip,
     increment_background_usage,
-    generate_reddit_card,
     render_short,
 )
 from src.upload import upload_short, check_scheduler_run
@@ -80,7 +80,7 @@ def main() -> None:
         args = ap.parse_args()
 
         print("=" * 70)
-        print("=== REDDIT TO SHORTS AUTOMATION PIPELINE ===")
+        print("=== MEME SHORTS AUTOMATION PIPELINE ===")
         print("=" * 70)
 
         # ── Step 0: Scheduler Gatekeeping ────────────────────
@@ -119,6 +119,7 @@ def main() -> None:
         narration = ""
         caption_title = ""
         emphasis = []
+        meme_image_path = None
 
         max_attempts = 15
         for attempt in range(1, max_attempts + 1):
@@ -138,10 +139,19 @@ def main() -> None:
                 "title": post.title[:40] + "..."
             })
 
-            # Stage 1 Safety Check: Immediately after Reddit Ingestion
+            # Step 1.5: Download Meme Image
+            from src.reddit.client import download_meme_image
+            try:
+                meme_image_path = download_meme_image(post.media_url)
+            except Exception as e:
+                log_stage_error("Reddit Ingestion", f"Failed to download meme image: {e}. Trying another post.")
+                continue
+
+            # Stage 1 Safety Check: Immediately after Reddit Ingestion and Image Download
             safety_res = safety_analyzer.check_safety(
                 title=post.title,
                 body=post.selftext,
+                image_path=meme_image_path,
                 stage="After Ingestion"
             )
 
@@ -196,6 +206,7 @@ def main() -> None:
                 description=optimized_meta["description"],
                 tags=optimized_meta["tags"],
                 captions=caption_title,
+                image_path=meme_image_path,
                 stage="After Narration"
             )
 
@@ -219,6 +230,7 @@ def main() -> None:
                 description=optimized_meta["description"],
                 tags=optimized_meta["tags"],
                 captions=caption_title,
+                image_path=meme_image_path,
                 stage="Before Rendering"
             )
 
@@ -251,18 +263,10 @@ def main() -> None:
 
         log_stage_finish("Background Selection", {"filename": bg_clip.name})
 
-        # ── Step 4: Reddit Card Overlay Image ────────────────
-        log_stage_start("Overlay Generation")
-        overlay_path = None
-        if config.OVERLAY_REDDIT_SCREENSHOT:
-            try:
-                overlay_path = generate_reddit_card(post)
-                log_stage_finish("Overlay Generation", {"path": str(overlay_path)})
-            except Exception as e:
-                log_stage_error("Overlay Generation", f"Failed: {e}. Proceeding without overlay.")
-                overlay_path = None
-        else:
-            log_stage_finish("Overlay Generation", {"status": "skipped"})
+        # ── Step 4: Overlay Selection ────────────────────────
+        log_stage_start("Overlay Selection")
+        overlay_path = meme_image_path
+        log_stage_finish("Overlay Selection", {"path": str(overlay_path)})
 
         # ── Step 5: Voice Synthesis (TTS) ───────────────────
         log_stage_start("Voice Synthesis")
@@ -313,6 +317,7 @@ def main() -> None:
                 description=optimized_meta["description"],
                 tags=optimized_meta["tags"],
                 metadata={"category_id": optimized_meta["category_id"]},
+                image_path=meme_image_path,
                 stage="Before Upload"
             )
 

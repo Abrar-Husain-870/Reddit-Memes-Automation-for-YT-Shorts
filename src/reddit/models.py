@@ -16,6 +16,7 @@ class RedditPost:
     author: str
     pinned: bool = False
     crosspost_parent: Optional[str] = None
+    media_url: Optional[str] = None
 
     @property
     def url(self) -> str:

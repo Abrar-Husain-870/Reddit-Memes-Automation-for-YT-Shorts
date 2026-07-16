@@ -61,10 +61,7 @@ def main() -> None:
     print("=" * 60)
     print()
     print("📌 Add this to your .env file:")
-    print(f'   YT_REFRESH_TOKEN="{creds.refresh_token}"')
-    print()
-    print("   Or if keeping both old and new tokens:")
-    print(f'   YT_REFRESH_TOKEN_GTA="{creds.refresh_token}"')
+    print(f'   YT_MEME_REFRESH_TOKEN="{creds.refresh_token}"')
     print()
 
 

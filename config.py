@@ -47,7 +47,7 @@ SUBREDDITS = [
     s.strip()
     for s in _env(
         "SUBREDDITS",
-        "funny, memes, AskReddit, tifu, Unexpected, mildlyinteresting, wholesomememes",
+        "memes, dankmemes, me_irl, meme, wholesomememes, funny, meirl",
     ).split(",")
     if s.strip()
 ]
@@ -155,9 +155,9 @@ OVERLAY_PROGRESS_BAR = _env_bool("OVERLAY_PROGRESS_BAR", True)
 OVERLAY_BACKGROUND_BLUR = _env_bool("OVERLAY_BACKGROUND_BLUR", True)
 
 # ── YouTube Upload Settings ──────────────────────────────────
-YT_CLIENT_ID = _env("YT_CLIENT_ID")
-YT_CLIENT_SECRET = _env("YT_CLIENT_SECRET_VALUE")
-YT_REFRESH_TOKEN = _env("YT_REFRESH_TOKEN")
+YT_CLIENT_ID = _env("YT_MEME_CLIENT_ID", _env("YT_CLIENT_ID"))
+YT_CLIENT_SECRET = _env("YT_MEME_CLIENT_SECRET_VALUE", _env("YT_CLIENT_SECRET_VALUE"))
+YT_REFRESH_TOKEN = _env("YT_MEME_REFRESH_TOKEN", _env("YT_REFRESH_TOKEN"))
 YT_PRIVACY = _env("YOUTUBE_PRIVACY", "public")
 
 # Engagement Metadata Customizations

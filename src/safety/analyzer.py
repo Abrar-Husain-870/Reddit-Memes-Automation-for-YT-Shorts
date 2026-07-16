@@ -2,6 +2,7 @@ import json
 import re
 import time
 import traceback
+from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import config
 from src.logger import logger
@@ -100,21 +101,56 @@ class ContentSafetyAnalyzer:
         
         return "Safe", [], ""
 
-    def _call_llm(self, system_prompt: str, user_prompt: str) -> str:
+    def _call_llm(self, system_prompt: str, user_prompt: str, image_path: Optional[Path] = None) -> str:
         """Call the configured LLM provider for content safety classification."""
         provider = config.LLM_PROVIDER.lower()
         model_name = config.LLM_MODEL
         
+        # If performing a vision check and Gemini key is configured, route to Gemini as it supports vision on the free tier
+        if image_path and config.GEMINI_API_KEY:
+            provider = "gemini"
+            model_name = "gemini-1.5-flash"
+        
+        try:
+            return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, image_path)
+        except Exception as e:
+            if image_path:
+                logger.warning(f"Safety check with image failed ({e}). Falling back to text-only safety scan.")
+                return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, None)
+            else:
+                raise e
+
+    def _call_llm_internal(self, provider: str, model_name: str, system_prompt: str, user_prompt: str, image_path: Optional[Path] = None) -> str:
         if provider == "groq":
             from groq import Groq
             if not config.GROQ_API_KEY:
                 raise ValueError("GROQ_API_KEY is not configured")
             client = Groq(api_key=config.GROQ_API_KEY)
+            
+            actual_model = model_name
+            if image_path:
+                import base64
+                with open(image_path, "rb") as img_f:
+                    b64_img = base64.b64encode(img_f.read()).decode('utf-8')
+                user_content = [
+                    {"type": "text", "text": user_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{b64_img}"
+                        }
+                    }
+                ]
+                if "vision" not in model_name.lower():
+                    actual_model = "llama-3.2-11b-vision-preview"
+            else:
+                user_content = user_prompt
+                
             completion = client.chat.completions.create(
-                model=model_name,
+                model=actual_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
+                    {"role": "user", "content": user_content},
                 ],
                 temperature=0.0,
                 max_tokens=300,
@@ -142,11 +178,28 @@ class ContentSafetyAnalyzer:
                 raise ValueError(f"{provider.upper()} API key is not configured")
                 
             client = openai.OpenAI(api_key=api_key, base_url=base_url)
+            
+            if image_path:
+                import base64
+                with open(image_path, "rb") as img_f:
+                    b64_img = base64.b64encode(img_f.read()).decode('utf-8')
+                user_content = [
+                    {"type": "text", "text": user_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{b64_img}"
+                        }
+                    }
+                ]
+            else:
+                user_content = user_prompt
+
             completion = client.chat.completions.create(
                 model=model_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
+                    {"role": "user", "content": user_content},
                 ],
                 temperature=0.0,
                 max_tokens=300,
@@ -163,8 +216,13 @@ class ContentSafetyAnalyzer:
                 model_name=model_name,
                 system_instruction=system_prompt
             )
+            contents = [user_prompt]
+            if image_path:
+                from PIL import Image
+                img = Image.open(image_path)
+                contents.append(img)
             response = model.generate_content(
-                user_prompt,
+                contents,
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.0,
                     max_output_tokens=300,
@@ -174,14 +232,14 @@ class ContentSafetyAnalyzer:
         else:
             raise ValueError(f"Unsupported LLM provider: {provider}")
 
-    def run_llm_scan(self, text: str) -> Tuple[str, List[str], str]:
+    def run_llm_scan(self, text: str, image_path: Optional[Path] = None) -> Tuple[str, List[str], str]:
         """
         Query LLM for contextual classification of content safety.
         Returns: Tuple (risk_score, categories_detected, reason)
         """
         system_prompt = (
             "You are an expert content safety classification assistant for a video sharing platform.\n"
-            "Your task is to analyze the provided text and determine if it violates YouTube Community Guidelines or advertiser-friendly content policies.\n\n"
+            "Your task is to analyze the provided text and image (if provided) and determine if it violates YouTube Community Guidelines or advertiser-friendly content policies.\n\n"
             "You MUST evaluate the content for the following 14 prohibited categories:\n"
             "1. Sexual assault\n"
             "2. Child exploitation or abuse\n"
@@ -215,7 +273,7 @@ class ContentSafetyAnalyzer:
         user_prompt = f"Text to analyze:\n{text}"
         
         try:
-            response_text = self._call_llm(system_prompt, user_prompt)
+            response_text = self._call_llm(system_prompt, user_prompt, image_path)
             # Clean response text in case it wrapped in markdown backticks
             cleaned = response_text.strip()
             if cleaned.startswith("```"):
@@ -251,6 +309,7 @@ class ContentSafetyAnalyzer:
         hashtags: List[str] = None,
         captions: str = "",
         metadata: dict = None,
+        image_path: Optional[Path] = None,
         stage: str = "Ingestion"
     ) -> Dict[str, any]:
         """
@@ -283,8 +342,8 @@ class ContentSafetyAnalyzer:
             text_parts.append(f"Metadata: {json.dumps(metadata)}")
 
         full_text = "\n\n".join(text_parts).strip()
-        if not full_text:
-            return {"passed": True, "risk_score": "Safe", "categories_detected": [], "reason": "No text content to check."}
+        if not full_text and not image_path:
+            return {"passed": True, "risk_score": "Safe", "categories_detected": [], "reason": "No content to check."}
 
         logger.info(f"Running content safety analysis (Stage: {stage})...")
 
@@ -298,7 +357,7 @@ class ContentSafetyAnalyzer:
         llm_success = False
 
         try:
-            risk_score, categories_detected, reason = self.run_llm_scan(full_text)
+            risk_score, categories_detected, reason = self.run_llm_scan(full_text, image_path)
             llm_success = True
             logger.info(f"LLM safety check succeeded. Risk: {risk_score}, Categories: {categories_detected}")
         except Exception as e:

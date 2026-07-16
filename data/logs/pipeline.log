@@ -424,3 +424,308 @@ Emphasis: ['FUTURE OF EDUCATION', 'INTERNET OF THINGS', "WORLD'S FIRST", 'NEW LA
 2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
 2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
 2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
+2026-07-16 22:51:32,796 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 22:51:32,798 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-16 22:51:32,798 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 22:51:32,799 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-16 22:51:32,813 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 22:51:32,813 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 22:51:32,815 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/AskReddit
+2026-07-16 22:51:32,818 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/AskReddit/top.json
+2026-07-16 22:51:33,255 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/AskReddit: 403 Client Error: Blocked for url: https://www.reddit.com/r/AskReddit/top.json?t=week
+2026-07-16 22:51:33,275 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/AskReddit/.rss
+2026-07-16 22:51:34,097 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:36,098 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/Unexpected
+2026-07-16 22:51:36,101 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/Unexpected/top.json
+2026-07-16 22:51:36,401 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/Unexpected: 403 Client Error: Blocked for url: https://www.reddit.com/r/Unexpected/top.json?t=week
+2026-07-16 22:51:36,403 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/Unexpected/.rss
+2026-07-16 22:51:36,789 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/Unexpected: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/Unexpected/.rss
+2026-07-16 22:51:36,790 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:38,791 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/memes
+2026-07-16 22:51:38,793 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/memes/top.json
+2026-07-16 22:51:39,713 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/memes: 403 Client Error: Blocked for url: https://www.reddit.com/r/memes/top.json?t=week
+2026-07-16 22:51:39,714 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/memes/.rss
+2026-07-16 22:51:40,005 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/memes: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/memes/.rss
+2026-07-16 22:51:40,006 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:42,007 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/tifu
+2026-07-16 22:51:42,010 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/tifu/top.json
+2026-07-16 22:51:42,366 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/tifu: 403 Client Error: Blocked for url: https://www.reddit.com/r/tifu/top.json?t=week
+2026-07-16 22:51:42,368 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/tifu/.rss
+2026-07-16 22:51:43,139 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/tifu: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/tifu/.rss
+2026-07-16 22:51:43,139 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:45,140 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/mildlyinteresting
+2026-07-16 22:51:45,142 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/mildlyinteresting/top.json
+2026-07-16 22:51:45,541 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/mildlyinteresting: 403 Client Error: Blocked for url: https://www.reddit.com/r/mildlyinteresting/top.json?t=week
+2026-07-16 22:51:45,542 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/mildlyinteresting/.rss
+2026-07-16 22:51:45,871 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/mildlyinteresting: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/mildlyinteresting/.rss
+2026-07-16 22:51:45,872 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:47,874 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/wholesomememes
+2026-07-16 22:51:47,876 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/wholesomememes/top.json
+2026-07-16 22:51:48,434 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/wholesomememes: 403 Client Error: Blocked for url: https://www.reddit.com/r/wholesomememes/top.json?t=week
+2026-07-16 22:51:48,435 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/wholesomememes/.rss
+2026-07-16 22:51:49,604 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/wholesomememes: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/wholesomememes/.rss
+2026-07-16 22:51:49,605 [INFO] RedditShortsPipeline: Pausing for 2.0s to respect Reddit rate limits...
+2026-07-16 22:51:51,607 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/funny
+2026-07-16 22:51:51,610 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/funny/top.json
+2026-07-16 22:51:51,957 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/funny: 403 Client Error: Blocked for url: https://www.reddit.com/r/funny/top.json?t=week
+2026-07-16 22:51:51,959 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/funny/.rss
+2026-07-16 22:51:52,251 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/funny: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/funny/.rss
+2026-07-16 22:51:52,251 [ERROR] RedditShortsPipeline: ❌ No eligible Reddit posts found matching all filters across all subreddits.
+2026-07-16 22:51:52,252 [ERROR] RedditShortsPipeline: ❌ FATAL IN STAGE: Reddit Ingestion (failed after 19.44s) — No suitable Reddit posts found matching criteria
+2026-07-16 22:56:06,685 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 22:56:06,687 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-16 22:56:06,687 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 22:56:06,688 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-16 22:56:06,702 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 22:56:06,702 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 22:56:06,704 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meirl
+2026-07-16 22:56:06,706 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meirl/top.json
+2026-07-16 22:56:07,052 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meirl: 403 Client Error: Blocked for url: https://www.reddit.com/r/meirl/top.json?t=week
+2026-07-16 22:56:07,070 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meirl/.rss
+2026-07-16 22:56:09,712 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/meirl - ID: 1uxudt1 - Title: Meirl...
+2026-07-16 22:56:09,713 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 3.01s | Metadata: {'id': '1uxudt1', 'subreddit': 'meirl', 'title': 'Meirl...'}
+2026-07-16 22:56:09,713 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://preview.redd.it/9wj0cth29jdh1.jpeg
+2026-07-16 22:56:09,775 [ERROR] RedditShortsPipeline: ❌ ERROR IN STAGE: Reddit Ingestion — Failed to download meme image: 403 Client Error: Forbidden for url: https://preview.redd.it/9wj0cth29jdh1.jpeg. Trying another post.
+2026-07-16 22:56:09,775 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 2/15)...
+2026-07-16 22:56:09,776 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 22:56:09,778 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/me_irl
+2026-07-16 22:56:09,780 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/me_irl/top.json
+2026-07-16 22:56:10,521 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/me_irl: 403 Client Error: Blocked for url: https://www.reddit.com/r/me_irl/top.json?t=week
+2026-07-16 22:56:10,522 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/me_irl/.rss
+2026-07-16 22:56:10,918 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/me_irl: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/me_irl/.rss
+2026-07-16 22:56:10,918 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:15,919 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/dankmemes
+2026-07-16 22:56:15,920 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/dankmemes/top.json
+2026-07-16 22:56:16,283 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/dankmemes: 403 Client Error: Blocked for url: https://www.reddit.com/r/dankmemes/top.json?t=week
+2026-07-16 22:56:16,283 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/dankmemes/.rss
+2026-07-16 22:56:16,648 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/dankmemes: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/dankmemes/.rss
+2026-07-16 22:56:16,648 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:21,649 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meirl
+2026-07-16 22:56:21,651 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meirl/top.json
+2026-07-16 22:56:21,953 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meirl: 403 Client Error: Blocked for url: https://www.reddit.com/r/meirl/top.json?t=week
+2026-07-16 22:56:21,954 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meirl/.rss
+2026-07-16 22:56:22,798 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/meirl: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/meirl/.rss
+2026-07-16 22:56:22,799 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:27,799 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/memes
+2026-07-16 22:56:27,802 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/memes/top.json
+2026-07-16 22:56:28,088 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/memes: 403 Client Error: Blocked for url: https://www.reddit.com/r/memes/top.json?t=week
+2026-07-16 22:56:28,089 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/memes/.rss
+2026-07-16 22:56:28,371 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/memes: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/memes/.rss
+2026-07-16 22:56:28,372 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:33,372 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meme
+2026-07-16 22:56:33,374 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meme/top.json
+2026-07-16 22:56:33,689 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meme: 403 Client Error: Blocked for url: https://www.reddit.com/r/meme/top.json?t=week
+2026-07-16 22:56:33,689 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meme/.rss
+2026-07-16 22:56:33,993 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/meme: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/meme/.rss
+2026-07-16 22:56:33,994 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:38,994 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/wholesomememes
+2026-07-16 22:56:38,996 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/wholesomememes/top.json
+2026-07-16 22:56:39,300 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/wholesomememes: 403 Client Error: Blocked for url: https://www.reddit.com/r/wholesomememes/top.json?t=week
+2026-07-16 22:56:39,301 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/wholesomememes/.rss
+2026-07-16 22:56:39,570 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/wholesomememes: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/wholesomememes/.rss
+2026-07-16 22:56:39,570 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 22:56:44,571 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/funny
+2026-07-16 22:56:44,573 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/funny/top.json
+2026-07-16 22:56:44,851 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/funny: 403 Client Error: Blocked for url: https://www.reddit.com/r/funny/top.json?t=week
+2026-07-16 22:56:44,851 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/funny/.rss
+2026-07-16 22:56:45,218 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/funny: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/funny/.rss
+2026-07-16 22:56:45,219 [ERROR] RedditShortsPipeline: ❌ No eligible Reddit posts found matching all filters across all subreddits.
+2026-07-16 22:56:45,219 [ERROR] RedditShortsPipeline: ❌ FATAL IN STAGE: Reddit Ingestion (failed after 35.44s) — No suitable Reddit posts found matching criteria
+2026-07-16 23:03:39,268 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 23:03:39,268 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-16 23:03:39,268 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 23:03:39,268 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-16 23:03:39,272 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 23:03:39,272 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 23:03:39,273 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meirl
+2026-07-16 23:03:39,273 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meirl/top.json
+2026-07-16 23:03:39,606 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meirl: 403 Client Error: Blocked for url: https://www.reddit.com/r/meirl/top.json?t=week
+2026-07-16 23:03:39,624 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meirl/.rss
+2026-07-16 23:03:40,568 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/meirl - ID: 1uxptv4 - Title: meirl...
+2026-07-16 23:03:40,569 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 1.30s | Metadata: {'id': '1uxptv4', 'subreddit': 'meirl', 'title': 'meirl...'}
+2026-07-16 23:03:40,569 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.redd.it/yjetcylv3idh1.png
+2026-07-16 23:03:40,947 [INFO] RedditShortsPipeline: Meme image successfully saved to C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.png (259076 bytes)
+2026-07-16 23:03:40,948 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-07-16 23:03:43,695 [WARNING] RedditShortsPipeline: Safety check with image failed (GROQ_API_KEY is not configured). Falling back to text-only safety scan.
+2026-07-16 23:03:43,699 [WARNING] RedditShortsPipeline: LLM content safety check failed: GROQ_API_KEY is not configured. Traceback: Traceback (most recent call last):
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 110, in _call_llm
+    return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, image_path)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 122, in _call_llm_internal
+    raise ValueError("GROQ_API_KEY is not configured")
+ValueError: GROQ_API_KEY is not configured
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 268, in run_llm_scan
+    response_text = self._call_llm(system_prompt, user_prompt, image_path)
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 114, in _call_llm
+    return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, None)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 122, in _call_llm_internal
+    raise ValueError("GROQ_API_KEY is not configured")
+ValueError: GROQ_API_KEY is not configured
+
+2026-07-16 23:03:43,699 [ERROR] RedditShortsPipeline: Contextual LLM safety scan error: GROQ_API_KEY is not configured
+2026-07-16 23:03:43,700 [WARNING] RedditShortsPipeline: Failing safe: LLM check failed in strict safety mode. Rejecting content.
+2026-07-16 23:03:43,700 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=False, Risk=Reject, AllowedMax=low
+2026-07-16 23:03:43,700 [WARNING] RedditShortsPipeline: Post 1uxptv4 rejected at Stage 1 Ingestion safety check. Reason: Strict mode fail-safe: Contextual safety check API failed/timed out. Error: GROQ_API_KEY is not configured
+2026-07-16 23:03:43,702 [INFO] RedditShortsPipeline: Successfully logged rejected post 1uxptv4 to database.
+2026-07-16 23:03:43,703 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 2/15)...
+2026-07-16 23:03:43,703 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 23:03:43,725 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meirl
+2026-07-16 23:03:43,727 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meirl/top.json
+2026-07-16 23:03:44,064 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meirl: 403 Client Error: Blocked for url: https://www.reddit.com/r/meirl/top.json?t=week
+2026-07-16 23:03:44,065 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meirl/.rss
+2026-07-16 23:03:44,455 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/meirl: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/meirl/.rss
+2026-07-16 23:03:44,455 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 23:03:49,456 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/funny
+2026-07-16 23:03:49,457 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/funny/top.json
+2026-07-16 23:03:49,738 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/funny: 403 Client Error: Blocked for url: https://www.reddit.com/r/funny/top.json?t=week
+2026-07-16 23:03:49,738 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/funny/.rss
+2026-07-16 23:03:50,591 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/funny: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/funny/.rss
+2026-07-16 23:03:50,592 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 23:03:55,592 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/me_irl
+2026-07-16 23:03:55,595 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/me_irl/top.json
+2026-07-16 23:03:56,030 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/me_irl: 403 Client Error: Blocked for url: https://www.reddit.com/r/me_irl/top.json?t=week
+2026-07-16 23:03:56,031 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/me_irl/.rss
+2026-07-16 23:03:56,440 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/me_irl: 429 Client Error: Too Many Requests for url: https://www.reddit.com/r/me_irl/.rss
+2026-07-16 23:03:56,441 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-16 23:37:57,916 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 23:37:57,920 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-16 23:37:57,920 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 23:37:57,921 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-16 23:37:57,936 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 23:37:57,936 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 23:37:57,939 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/funny
+2026-07-16 23:37:59,601 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/funny/top.json
+2026-07-16 23:38:01,155 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/funny: 403 Client Error: Blocked for url: https://www.reddit.com/r/funny/top.json?t=week
+2026-07-16 23:38:01,176 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/funny/.rss
+2026-07-16 23:38:03,127 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/funny - ID: 1ux6ftq - Title: Boundaries [oc]...
+2026-07-16 23:38:03,127 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 5.19s | Metadata: {'id': '1ux6ftq', 'subreddit': 'funny', 'title': 'Boundaries [oc]...'}
+2026-07-16 23:38:03,127 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.redd.it/0z0bjjwweedh1.jpeg
+2026-07-16 23:38:04,597 [INFO] RedditShortsPipeline: Meme image successfully saved to C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.jpeg (286901 bytes)
+2026-07-16 23:38:04,600 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-07-16 23:38:07,700 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:38:07,701 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'messages[1].content must be a string', 'type': 'invalid_request_error', 'param': 'messages[1].content'}}). Falling back to text-only safety scan.
+2026-07-16 23:38:08,930 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:38:08,959 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Low Risk, Categories: []
+2026-07-16 23:38:08,959 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=True, Risk=Low Risk, AllowedMax=low
+2026-07-16 23:38:08,960 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Script Generation
+2026-07-16 23:38:09,725 [INFO] RedditShortsPipeline: Sending request to Groq model: llama-3.1-8b-instant
+2026-07-16 23:38:10,165 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:38:10,172 [WARNING] RedditShortsPipeline: LLM script generation failed (Generated script is too short or empty). Using local regex cleanup fallback.
+2026-07-16 23:38:10,172 [INFO] RedditShortsPipeline: Local fallback narration generated successfully
+2026-07-16 23:38:10,173 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Script Generation in 1.21s | Metadata: {'title': 'Boundaries [oc]', 'word_count': 7, 'emphasis_count': 0}
+2026-07-16 23:38:10,173 [INFO] RedditShortsPipeline: Generated Script Text:
+Boundaries [oc]. submitted by /u/Zoodraws [link] [comments]
+Emphasis: []
+2026-07-16 23:38:10,184 [INFO] RedditShortsPipeline: Generating optimized metadata for Short...
+2026-07-16 23:38:10,184 [INFO] RedditShortsPipeline: Metadata generated successfully:
+2026-07-16 23:38:10,185 [INFO] RedditShortsPipeline:    Optimized Title: r/funny | One Small Decision Changed Everything...
+2026-07-16 23:38:10,185 [INFO] RedditShortsPipeline:    Category ID: 22
+2026-07-16 23:38:10,185 [INFO] RedditShortsPipeline:    Tags Count: 20
+2026-07-16 23:38:10,185 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 23:38:11,222 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:38:11,223 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'messages[1].content must be a string', 'type': 'invalid_request_error', 'param': 'messages[1].content'}}). Falling back to text-only safety scan.
+2026-07-16 23:38:12,327 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:38:12,329 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Low Risk, Categories: []
+2026-07-16 23:38:12,329 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=True, Risk=Low Risk, AllowedMax=low
+2026-07-16 23:38:12,330 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: Before Rendering)...
+2026-07-16 23:38:13,356 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:38:13,357 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'messages[1].content must be a string', 'type': 'invalid_request_error', 'param': 'messages[1].content'}}). Falling back to text-only safety scan.
+2026-07-16 23:38:14,681 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:38:14,683 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Low Risk, Categories: []
+2026-07-16 23:38:14,683 [INFO] RedditShortsPipeline: Safety check results (Stage: Before Rendering): Passed=True, Risk=Low Risk, AllowedMax=low
+2026-07-16 23:38:14,683 [INFO] RedditShortsPipeline: 🎉 Post 1ux6ftq passed all pre-rendering safety gates! Proceeding to rendering.
+2026-07-16 23:38:14,683 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Background Selection
+2026-07-16 23:38:14,686 [INFO] RedditShortsPipeline: Selected background clip: 'xwntkv3FfqA_clip_007.mp4' (used 3 times previously)
+2026-07-16 23:38:14,689 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Background Selection in 0.01s | Metadata: {'filename': 'xwntkv3FfqA_clip_007.mp4'}
+2026-07-16 23:38:14,689 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Overlay Selection
+2026-07-16 23:38:14,689 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Overlay Selection in 0.00s | Metadata: {'path': 'C:\\Users\\husai\\Desktop\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\meme_image.jpeg'}
+2026-07-16 23:38:14,690 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Voice Synthesis
+2026-07-16 23:38:14,701 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-GuyNeural)
+2026-07-16 23:38:16,479 [ERROR] RedditShortsPipeline: Edge TTS synthesis error: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x0000027D62031B50> [The specified network name is no longer available]
+2026-07-16 23:38:16,480 [WARNING] RedditShortsPipeline: Configured TTS provider 'edge' failed: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x0000027D62031B50> [The specified network name is no longer available]. Falling back to Edge TTS.
+2026-07-16 23:38:16,482 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-AndrewNeural)
+2026-07-16 23:38:23,579 [INFO] RedditShortsPipeline: Generated Edge TTS voiceover: 5.40s (2 sentences)
+2026-07-16 23:38:23,580 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Voice Synthesis in 8.89s | Metadata: {'duration_s': 5.4, 'sentences': 2}
+2026-07-16 23:38:23,580 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Video Rendering
+2026-07-16 23:38:23,666 [INFO] RedditShortsPipeline: Rendering pipeline: Background 'xwntkv3FfqA_clip_007.mp4' | Audio duration: 5.40s
+2026-07-16 23:38:23,671 [INFO] RedditShortsPipeline: Running FFmpeg render (60 FPS, presets: medium, output: final_short.mp4)
+2026-07-16 23:39:27,535 [INFO] RedditShortsPipeline: ✔ Short rendered successfully: final_short.mp4 (3.21MB, 60fps)
+2026-07-16 23:39:27,536 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Video Rendering in 63.96s | Metadata: {'output_video': 'C:\\Users\\husai\\Desktop\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\final_short.mp4'}
+2026-07-16 23:39:27,536 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Database Update
+2026-07-16 23:39:27,542 [INFO] RedditShortsPipeline: Saved Reddit ID 1ux6ftq to history database
+2026-07-16 23:39:27,545 [INFO] RedditShortsPipeline: Updated background usage: xwntkv3FfqA_clip_007.mp4 has been used 4 time(s)
+2026-07-16 23:39:27,545 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Database Update in 0.01s
+2026-07-16 23:39:27,546 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
+2026-07-16 23:39:27,546 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
+2026-07-16 23:39:27,547 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
+2026-07-16 23:40:00,481 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 23:40:00,482 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-16 23:40:00,483 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 23:40:00,483 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.00s | Metadata: {'should_run': True}
+2026-07-16 23:40:00,509 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 23:40:00,510 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 23:40:00,535 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meme
+2026-07-16 23:40:01,365 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/meme/top.json
+2026-07-16 23:40:02,924 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meme: 403 Client Error: Blocked for url: https://www.reddit.com/r/meme/top.json?t=week
+2026-07-16 23:40:02,942 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/meme/.rss
+2026-07-16 23:40:05,643 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/meme - ID: 1uxyw0y - Title: I miss the good old days...
+2026-07-16 23:40:05,644 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 5.13s | Metadata: {'id': '1uxyw0y', 'subreddit': 'meme', 'title': 'I miss the good old days...'}
+2026-07-16 23:40:05,644 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.redd.it/0zcnmex1jkdh1.jpeg
+2026-07-16 23:40:07,121 [INFO] RedditShortsPipeline: Meme image successfully saved to C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.jpeg (95601 bytes)
+2026-07-16 23:40:07,124 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-07-16 23:40:09,862 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:40:09,863 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'The model `llama-3.2-11b-vision-preview` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}). Falling back to text-only safety scan.
+2026-07-16 23:40:11,203 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:40:11,230 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Low Risk, Categories: []
+2026-07-16 23:40:11,230 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=True, Risk=Low Risk, AllowedMax=low
+2026-07-16 23:40:11,231 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Script Generation
+2026-07-16 23:40:12,077 [INFO] RedditShortsPipeline: Sending request to Groq model: llama-3.1-8b-instant
+2026-07-16 23:40:12,544 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:40:12,552 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Script Generation in 1.32s | Metadata: {'title': 'Nostalgia Mode Activated', 'word_count': 12, 'emphasis_count': 1}
+2026-07-16 23:40:12,553 [INFO] RedditShortsPipeline: Generated Script Text:
+Remembering the GOOD OLD DAYS when life was simpler and less EXPENSIVE.
+Emphasis: ['GOOD OLD EXPENSIVE']
+2026-07-16 23:40:12,556 [INFO] RedditShortsPipeline: Generating optimized metadata for Short...
+2026-07-16 23:40:12,557 [INFO] RedditShortsPipeline: Metadata generated successfully:
+2026-07-16 23:40:12,557 [INFO] RedditShortsPipeline:    Optimized Title: When Life Was Simpler - A Blast from the Past
+2026-07-16 23:40:12,557 [INFO] RedditShortsPipeline:    Category ID: 23
+2026-07-16 23:40:12,558 [INFO] RedditShortsPipeline:    Tags Count: 20
+2026-07-16 23:40:12,558 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 23:40:13,480 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:40:13,481 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'The model `llama-3.2-11b-vision-preview` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}). Falling back to text-only safety scan.
+2026-07-16 23:40:14,693 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:40:14,696 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 23:40:14,697 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 23:40:14,697 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: Before Rendering)...
+2026-07-16 23:40:15,856 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-07-16 23:40:15,858 [WARNING] RedditShortsPipeline: Safety check with image failed (Error code: 400 - {'error': {'message': 'The model `llama-3.2-11b-vision-preview` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}). Falling back to text-only safety scan.
+2026-07-16 23:40:17,001 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 23:40:17,004 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 23:40:17,004 [INFO] RedditShortsPipeline: Safety check results (Stage: Before Rendering): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 23:40:17,004 [INFO] RedditShortsPipeline: 🎉 Post 1uxyw0y passed all pre-rendering safety gates! Proceeding to rendering.
+2026-07-16 23:40:17,005 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Background Selection
+2026-07-16 23:40:17,029 [INFO] RedditShortsPipeline: Selected background clip: 'xwntkv3FfqA_clip_034.mp4' (used 3 times previously)
+2026-07-16 23:40:17,030 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Background Selection in 0.03s | Metadata: {'filename': 'xwntkv3FfqA_clip_034.mp4'}
+2026-07-16 23:40:17,031 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Overlay Selection
+2026-07-16 23:40:17,031 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Overlay Selection in 0.00s | Metadata: {'path': 'C:\\Users\\husai\\Desktop\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\meme_image.jpeg'}
+2026-07-16 23:40:17,031 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Voice Synthesis
+2026-07-16 23:40:17,034 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-AndrewNeural)
+2026-07-16 23:40:21,200 [INFO] RedditShortsPipeline: Generated Edge TTS voiceover: 4.66s (1 sentences)
+2026-07-16 23:40:21,200 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Voice Synthesis in 4.17s | Metadata: {'duration_s': 4.656, 'sentences': 1}
+2026-07-16 23:40:21,200 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Video Rendering
+2026-07-16 23:40:21,277 [INFO] RedditShortsPipeline: Rendering pipeline: Background 'xwntkv3FfqA_clip_034.mp4' | Audio duration: 4.66s
+2026-07-16 23:40:21,280 [INFO] RedditShortsPipeline: Running FFmpeg render (60 FPS, presets: medium, output: final_short.mp4)
+2026-07-16 23:41:37,176 [INFO] RedditShortsPipeline: ✔ Short rendered successfully: final_short.mp4 (6.43MB, 60fps)
+2026-07-16 23:41:37,177 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Video Rendering in 75.98s | Metadata: {'output_video': 'C:\\Users\\husai\\Desktop\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\final_short.mp4'}
+2026-07-16 23:41:37,178 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Database Update
+2026-07-16 23:41:37,181 [INFO] RedditShortsPipeline: Saved Reddit ID 1uxyw0y to history database
+2026-07-16 23:41:37,184 [INFO] RedditShortsPipeline: Updated background usage: xwntkv3FfqA_clip_034.mp4 has been used 4 time(s)
+2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Database Update in 0.01s
+2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
+2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
+2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: Cleaning up temporary render files...

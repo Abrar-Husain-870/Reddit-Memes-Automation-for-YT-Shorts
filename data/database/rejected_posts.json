@@ -6,5 +6,13 @@
     "detection_category": "suicide_or_self_harm",
     "reason": "Matched suicide and self-harm keywords locally",
     "timestamp": "2026-07-16T13:42:31Z"
+  },
+  {
+    "reddit_id": "1uxptv4",
+    "subreddit": "meirl",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: GROQ_API_KEY is not configured",
+    "timestamp": "2026-07-16T17:33:43Z"
   }
 ]
