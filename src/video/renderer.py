@@ -198,9 +198,20 @@ def render_short(
     # Get audio duration to sync video cut length
     audio_dur = _get_audio_duration(audio_path)
     
-    # Calculate exact video duration: 2.0s padding at start, 3.0s reading silence at end
-    render_duration = min(59.0, audio_dur + 2.0 + 3.0)
-    logger.info(f"Rendering pipeline: Background '{clip_path.name}' | Audio duration: {audio_dur:.2f}s | Target Short duration: {render_duration:.2f}s")
+    # Calculate freeze duration and total render duration
+    if is_cat_clip:
+        freeze_dur = 2.0 + audio_dur + 3.0
+        cat_dur = 5.0
+        try:
+            cat_dur = _get_audio_duration(clip_path)
+        except Exception as e:
+            logger.warning(f"Failed to get cat clip duration: {e}. Using 5.0s default.")
+        render_duration = freeze_dur + cat_dur
+        logger.info(f"Rendering pipeline (Cat Reaction): Static freeze for {freeze_dur:.2f}s, then motion for {cat_dur:.2f}s | Total duration: {render_duration:.2f}s")
+    else:
+        freeze_dur = 0.0
+        render_duration = min(59.0, audio_dur + 2.0 + 3.0)
+        logger.info(f"Rendering pipeline (Standard Background): Target Short duration: {render_duration:.2f}s")
     
     # Clean narration string
     clean_narration = narration.replace("**", "").replace("__", "").replace("*", "")
@@ -212,16 +223,17 @@ def render_short(
     target_cat_h = 480
     y_list = None
     
-    # Adaptive Aspect Ratio calculations for Cat Reactions layout
-    if is_cat_clip and overlay_card_path and overlay_card_path.exists():
-        # Get Meme Image dimensions
-        mw, mh = 1080, 1080
+    # Get Meme Image dimensions
+    mw, mh = 1080, 1080
+    if overlay_card_path and overlay_card_path.exists():
         try:
             mw, mh = _get_image_dimensions(overlay_card_path)
         except Exception as e:
             logger.warning(f"Failed to read image dimensions for {overlay_card_path}: {e}. Using default square.")
-        mar = mw / mh
-        
+    mar = mw / mh
+    
+    # Adaptive Aspect Ratio calculations for Cat Reactions layout
+    if is_cat_clip and overlay_card_path and overlay_card_path.exists():
         # Get Cat Reaction video dimensions
         cw, ch = 1920, 1080
         try:
@@ -271,6 +283,37 @@ def render_short(
             make_even(cat_center_y - 15),
             make_even(cat_center_y + 15)
         ]
+    else:
+        # Fallback Mode: calculate Y positions to guarantee no overlap with centered meme
+        max_h = 1400
+        scale_factor = min(1000 / mw, max_h / mh, 1.0)
+        scaled_h = mh * scale_factor
+        y_end = (1920 + scaled_h) / 2
+        
+        # If the meme is very tall and leaves less than 280px at the bottom, scale it down to 1200 max height
+        if (1920 - y_end) < 280:
+            max_h = 1200
+            scale_factor = min(1000 / mw, max_h / mh, 1.0)
+            scaled_h = mh * scale_factor
+            y_end = (1920 + scaled_h) / 2
+            
+        scale_w_meme_fb = make_even(mw * scale_factor)
+        scale_h_meme_fb = make_even(mh * scale_factor)
+        
+        bottom_space_center = y_end + (1920 - y_end) / 2
+        
+        # Define y_list centered in bottom space, keeping inside 1920 boundaries
+        y_list = [
+            make_even(bottom_space_center - 30),
+            make_even(bottom_space_center),
+            make_even(bottom_space_center + 30),
+            make_even(bottom_space_center - 15),
+            make_even(bottom_space_center + 15)
+        ]
+        
+        # Clamp values so they don't draw off-screen (max 1860, min y_end + 45)
+        min_allowable_y = int(y_end + 45)
+        y_list = [min(1860, max(y, min_allowable_y)) for y in y_list]
         
     # Map timestamps and build subtitle ASS file
     timings = _build_word_timings(words, audio_dur, sentence_timings)
@@ -287,20 +330,33 @@ def render_short(
     filter_chains = []
     
     if is_cat_clip and overlay_card_path and overlay_card_path.exists():
-        # Setup 3 inputs: cat video, narration audio, meme image
+        # Setup 3 inputs: cat video (no stream loop), narration audio, meme image
         inputs = [
-            "-stream_loop", "-1",
             "-i", str(clip_path),
             "-i", str(audio_path),
             "-i", str(overlay_card_path)
         ]
         
-        # 1. Composite Cat Box (blurred background + centered scaled foreground)
+        # 0. Create the combined cat video stream: frozen first frame up to freeze_dur, then playing from start.
         filter_chains.append(
-            f"[0:v]scale=1080:{target_cat_h}:force_original_aspect_ratio=increase,crop=1080:{target_cat_h},boxblur=20:5[cat_bg]"
+            f"[0:v]trim=duration=0.1,loop=loop=-1:size=1:start=0,setpts=PTS-STARTPTS[cat_frozen_raw]"
         )
         filter_chains.append(
-            f"[0:v]scale={scale_w_cat}:{scale_h_cat}[cat_fg]"
+            f"[0:v]setpts=PTS+{freeze_dur}/TB[cat_moving]"
+        )
+        filter_chains.append(
+            f"[cat_frozen_raw][cat_moving]overlay=enable='gt(t,{freeze_dur})':eof_action=pass[cat_combined]"
+        )
+        
+        # 1. Composite Cat Box (blurred background + centered scaled foreground with zoom pop transition)
+        filter_chains.append(
+            f"[cat_combined]scale=1080:{target_cat_h}:force_original_aspect_ratio=increase,crop=1080:{target_cat_h},boxblur=20:5[cat_bg]"
+        )
+        
+        # Dynamic zoom pop transition expression (12% zoom at the moment of transition)
+        zoom_expr = f"1.0 + 0.12 * max(0, 1 - (t - {freeze_dur})/0.2) * between(t, {freeze_dur}, {freeze_dur} + 0.2)"
+        filter_chains.append(
+            f"[cat_combined]scale=w='{scale_w_cat} * ({zoom_expr})':h='{scale_h_cat} * ({zoom_expr})':eval=frame[cat_fg]"
         )
         filter_chains.append(
             f"[cat_bg][cat_fg]overlay=x=(1080-w)/2:y=({target_cat_h}-h)/2[cat_box]"
@@ -354,7 +410,7 @@ def render_short(
         if overlay_card_path and overlay_card_path.exists():
             inputs.extend(["-i", str(overlay_card_path)])
             filter_chains.append(
-                "[2:v]scale=w='min(1000,iw)':h='min(1400,ih)':force_original_aspect_ratio=decrease[meme_scaled]"
+                f"[2:v]scale={scale_w_meme_fb}:{scale_h_meme_fb}[meme_scaled]"
             )
             filter_chains.append(
                 f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y=(1920-h)/2[v_meme]"
@@ -410,9 +466,10 @@ def render_short(
     logger.info(f"Running FFmpeg render (60 FPS, preset: medium, output: {output_path.name})")
     
     try:
-        r = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=RENDER_TIMEOUT)
+        r = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=RENDER_TIMEOUT)
         if r.returncode != 0:
             logger.error(f"FFmpeg failed with exit code {r.returncode}")
+            logger.error(f"FFmpeg stderr: {r.stderr}")
             raise RuntimeError(f"FFmpeg render failed with exit code {r.returncode}")
     except subprocess.TimeoutExpired:
         logger.error("FFmpeg render timed out")
