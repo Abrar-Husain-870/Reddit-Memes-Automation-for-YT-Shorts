@@ -217,18 +217,37 @@ def render_short(
     clean_narration = narration.replace("**", "").replace("__", "").replace("*", "")
     clean_narration = re.sub(r'[^\w\s\'",.!?;:\-]', "", clean_narration).strip()
     words = [w for w in clean_narration.split() if w.strip()]
-    # Get Meme Image dimensions and scale to fit in [1000x1200] area centered in the lower space [320, 1920]
+    # ── Layout zones (pixels, 1080×1920 canvas) ──────────────────────────────
+    # ┌────────────────────┐  y=0
+    # │  Caption Bar       │  320px  → Zone 1  (subtitles only, black bg)
+    # ├────────────────────┤  y=320
+    # │                    │
+    # │    Meme Image      │  900px  → Zone 2
+    # │                    │
+    # ├────────────────────┤  y=1220
+    # │                    │
+    # │   Cat Clip         │  700px  → Zone 3
+    # │  (frozen→motion)   │
+    # └────────────────────┘  y=1920
+    # ─────────────────────────────────────────────────────────────────────────
+    CAPTION_H = 320
+    MEME_H    = 900
+    CAT_H     = 700
+    MEME_TOP  = CAPTION_H            # 320
+    CAT_TOP   = CAPTION_H + MEME_H  # 1220
+
+    # Meme image — fit inside Zone 2 (1080 × MEME_H), keeping aspect ratio
     scale_w_meme = 1080
-    scale_h_meme = 1080
+    scale_h_meme = MEME_H
     if overlay_card_path and overlay_card_path.exists():
         try:
             mw, mh = _get_image_dimensions(overlay_card_path)
         except Exception as e:
-            logger.warning(f"Failed to read image dimensions for {overlay_card_path}: {e}. Using default square.")
+            logger.warning(f"Failed to read image dimensions for {overlay_card_path}: {e}. Using defaults.")
             mw, mh = 1080, 1080
         mar = mw / mh
-        max_w = 1000
-        max_h = 1200
+        max_w = 1060   # slight padding from edges
+        max_h = MEME_H - 20
         scale_w_meme = max_w
         scale_h_meme = int(max_w / mar)
         if scale_h_meme > max_h:
@@ -236,124 +255,116 @@ def render_short(
             scale_w_meme = int(max_h * mar)
         scale_w_meme = make_even(scale_w_meme)
         scale_h_meme = make_even(scale_h_meme)
-        
-    # Subtitles are placed in the top 320px area (centered around y = 160px from top, which is MarginV = 1760)
-    y_list = [1730, 1760, 1790, 1745, 1775]
-    
-    # Get Cat Reaction video dimensions if is_cat_clip is True
+
+    # Subtitles confined to the top Caption Bar (0 → 320px).
+    # ASS MarginV is measured from the BOTTOM of the 1920px canvas.
+    # To place text at y≈160 (centre of 320px bar): MarginV = 1920 - 160 = 1760
+    y_list = [1760, 1780, 1740, 1770, 1750]
+
+    # Cat clip aspect ratio
     car = 16 / 9
     if is_cat_clip:
         try:
             cw, ch = _get_video_dimensions(clip_path)
             car = cw / ch
         except Exception as e:
-            logger.warning(f"Failed to read video dimensions for {clip_path}: {e}. Using default landscape.")
-            
-    # Map timestamps and build subtitle ASS file
+            logger.warning(f"Failed to read video dimensions for {clip_path}: {e}. Using 16/9 default.")
+
+    # Build word timings & ASS subtitle file
     timings = _build_word_timings(words, audio_dur, sentence_timings)
     ass_content = _build_ass_subtitles(timings, style, emphasis_words, alternate_y=y_list)
-    
-    # Save ASS captions
     ass_path = config.OUTPUT_DIR / "captions.ass"
     ass_path.write_text(ass_content, encoding="utf-8")
-    
-    # Escape path prefix for FFmpeg subtitles filter
     ass_safe_path = "data/output/captions.ass"
-    
-    # Filter Complex Building
+
+    # ── Filter Complex ──────────────────────────────────────────────────────
     filter_chains = []
-    
+
     if is_cat_clip and overlay_card_path and overlay_card_path.exists():
-        # Setup 3 inputs: cat video (no stream loop), narration audio, meme image
+        # 3 inputs: cat video, audio, meme image
         inputs = [
             "-i", str(clip_path),
             "-i", str(audio_path),
-            "-i", str(overlay_card_path)
+            "-i", str(overlay_card_path),
         ]
-        
-        # 0. Create the combined cat video stream: frozen first frame up to freeze_dur, then playing from start.
+
+        # 0. Black 1080×1920 canvas
+        filter_chains.append("color=c=black:s=1080x1920:r=60[canvas]")
+
+        # 1. Frozen cat thumbnail — loop the very first frame
         filter_chains.append(
-            f"[0:v]trim=duration=0.1,loop=loop=-1:size=1:start=0,setpts=PTS-STARTPTS[cat_frozen_raw]"
+            "[0:v]trim=duration=0.1,loop=loop=-1:size=1:start=0,setpts=PTS-STARTPTS[cat_frozen]"
         )
+
+        # 2. Live cat stream — delayed so playback starts after freeze_dur
         filter_chains.append(
-            f"[0:v]setpts=PTS+{freeze_dur}/TB[cat_moving]"
+            f"[0:v]setpts=PTS+{freeze_dur}/TB[cat_live]"
         )
+
+        # 3. Switch from frozen → live at freeze_dur (overlay swap)
         filter_chains.append(
-            f"[cat_frozen_raw][cat_moving]overlay=enable='gt(t,{freeze_dur})':eof_action=pass[cat_combined]"
+            f"[cat_frozen][cat_live]overlay=enable='gt(t,{freeze_dur})':eof_action=pass[cat_combined]"
         )
-        
-        # 1. Composite Cat Background (blurred background + centered scaled foreground with zoom pop transition)
-        zoom_expr = f"1.0 + 0.12 * max(0, 1 - (t - {freeze_dur})/0.2) * between(t, {freeze_dur}, {freeze_dur} + 0.2)"
-        scale_h_cat = make_even(int(1080 / car))
-        
-        if config.OVERLAY_BACKGROUND_BLUR:
-            filter_chains.append(
-                f"[cat_combined]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=25:5[cat_bg]"
-            )
-            filter_chains.append(
-                f"[cat_combined]scale=w='1080 * ({zoom_expr})':h='{scale_h_cat} * ({zoom_expr})':eval=frame[cat_fg]"
-            )
-            filter_chains.append(
-                f"[cat_bg][cat_fg]overlay=x=(1080-w)/2:y=(1920-h)/2[v_base]"
-            )
-        else:
-            # Calculate cover sizes
-            if car > (1080/1920):
-                scale_h_cover = 1920
-                scale_w_cover = int(1920 * car)
-            else:
-                scale_w_cover = 1080
-                scale_h_cover = int(1080 / car)
-            scale_w_cover = make_even(scale_w_cover)
-            scale_h_cover = make_even(scale_h_cover)
-            filter_chains.append(
-                f"[cat_combined]scale=w='{scale_w_cover} * ({zoom_expr})':h='{scale_h_cover} * ({zoom_expr})':eval=frame,crop=1080:1920[v_base]"
-            )
-            
-        # 2. Composite Meme Box Centered vertically in the lower space [320, 1920] (center at y=1120)
+
+        # 4. Scale cat to cover-fill Zone 3 (1080 × CAT_H), then crop to exact size
         filter_chains.append(
-            f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_scaled]"
+            f"[cat_combined]scale={1080}:{CAT_H}:force_original_aspect_ratio=increase,"
+            f"crop={1080}:{CAT_H}[cat_zone]"
         )
+
+        # 5. Scale meme to fit Zone 2 (preserve aspect ratio, no crop)
         filter_chains.append(
-            f"[v_base][meme_scaled]overlay=x=(1080-w)/2:y='1120-h/2 + 10*sin(2*PI*t/3.0)'[v_meme]"
+            f"[2:v]scale={scale_w_meme}:{scale_h_meme}:force_original_aspect_ratio=decrease[meme_zone]"
         )
-        last_v_tag = "v_meme"
-        
+
+        # 6. Stamp cat into Zone 3 on the canvas
+        filter_chains.append(
+            f"[canvas][cat_zone]overlay=x=0:y={CAT_TOP}[canvas_cat]"
+        )
+
+        # 7. Stamp meme centred vertically inside Zone 2 (with gentle float bob)
+        meme_centre_y = MEME_TOP + MEME_H // 2  # = 770
+        filter_chains.append(
+            f"[canvas_cat][meme_zone]"
+            f"overlay=x=(1080-w)/2:y='{meme_centre_y}-h/2+8*sin(2*PI*t/3.0)'"
+            f"[v_layout]"
+        )
+
+        last_v_tag = "v_layout"
+
     else:
-        # Fallback to standard gameplay background composition (2 inputs)
+        # Standard gameplay background (no cat)
         inputs = [
             "-stream_loop", "-1",
             "-i", str(clip_path),
-            "-i", str(audio_path)
+            "-i", str(audio_path),
         ]
-        
+
         if config.OVERLAY_BACKGROUND_BLUR:
-            # Create a blurred background layer, scale foreground over it
             filter_chains.append(
-                "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=25:5[bg]"
+                "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,"
+                "crop=1080:1920,boxblur=25:5[bg]"
             )
-            filter_chains.append(
-                "[0:v]scale=1080:-1[fg_scaled]"
-            )
-            filter_chains.append(
-                "[bg][fg_scaled]overlay=x=0:y=(1920-h)/2[v_base]"
-            )
+            filter_chains.append("[0:v]scale=1080:-1[fg_scaled]")
+            filter_chains.append("[bg][fg_scaled]overlay=x=0:y=(1920-h)/2[v_base]")
         else:
-            # Standard scale and crop to 9:16
             filter_chains.append(
-                "[0:v]scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920,unsharp=5:5:1.0:5:5:0.0[v_base]"
+                "[0:v]scale=1080:1920:flags=lanczos:"
+                "force_original_aspect_ratio=increase,crop=1080:1920,"
+                "unsharp=5:5:1.0:5:5:0.0[v_base]"
             )
-            
+
         last_v_tag = "v_base"
-        
-        # Add Meme Image overlay centered in the lower space [320, 1920] (center at y=1120)
+
+        # Meme centred in the lower space [320 → 1920]
         if overlay_card_path and overlay_card_path.exists():
             inputs.extend(["-i", str(overlay_card_path)])
             filter_chains.append(
                 f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_scaled]"
             )
             filter_chains.append(
-                f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y='1120-h/2 + 10*sin(2*PI*t/3.0)'[v_meme]"
+                f"[{last_v_tag}][meme_scaled]"
+                f"overlay=x=(1080-w)/2:y='1120-h/2+8*sin(2*PI*t/3.0)'[v_meme]"
             )
             last_v_tag = "v_meme"
             
