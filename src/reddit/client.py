@@ -23,16 +23,31 @@ DEFAULT_HEADERS = {
 
 
 def load_processed_ids() -> Set[str]:
-    """Load the set of already processed Reddit post IDs."""
+    """Load the set of already processed and rejected Reddit post IDs."""
+    ids = set()
     if config.HISTORY_FILE.exists():
         try:
             with open(config.HISTORY_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if isinstance(data, list):
-                    return set(data)
+                    ids.update(data)
         except Exception as e:
-            logger.warning(f"Failed to read Reddit post history: {e}. Starting fresh.")
-    return set()
+            logger.warning(f"Failed to read Reddit post history: {e}.")
+            
+    # Load rejected posts to prevent them from ever being retried
+    rejected_file = config.DB_DIR / "rejected_posts.json"
+    if rejected_file.exists():
+        try:
+            with open(rejected_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict) and "reddit_id" in item:
+                            ids.add(item["reddit_id"])
+        except Exception as e:
+            logger.warning(f"Failed to read rejected posts history: {e}.")
+            
+    return ids
 
 
 def save_processed_id(post_id: str) -> None:

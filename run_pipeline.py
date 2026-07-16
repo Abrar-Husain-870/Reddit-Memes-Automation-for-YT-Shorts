@@ -109,46 +109,137 @@ def main() -> None:
         if args.subreddit:
             config.SUBREDDITS = [s.strip() for s in args.subreddit.split(",") if s.strip()]
 
-        # ── Step 1: Reddit Ingestion ─────────────────────────
-        log_stage_start("Reddit Ingestion")
-        post = get_random_reddit_post()
-        if not post:
-            error_msg = "No suitable Reddit posts found matching criteria"
+        # ── Step 1 & 2: Ingestion & Safety Verification Loop ──
+        from src.safety import ContentSafetyAnalyzer, log_rejected_post
+        safety_analyzer = ContentSafetyAnalyzer()
+
+        post = None
+        script_data = None
+        optimized_meta = None
+        narration = ""
+        caption_title = ""
+        emphasis = []
+
+        max_attempts = 15
+        for attempt in range(1, max_attempts + 1):
+            logger.info(f"Attempting post safety verification (Try {attempt}/{max_attempts})...")
+
+            # Step 1: Reddit Ingestion
+            log_stage_start("Reddit Ingestion")
+            post = get_random_reddit_post()
+            if not post:
+                error_msg = "No suitable Reddit posts found matching criteria"
+                log_stage_error("Reddit Ingestion", error_msg, fatal=True)
+                sys.exit(1)
+
+            log_stage_finish("Reddit Ingestion", {
+                "id": post.id,
+                "subreddit": post.subreddit,
+                "title": post.title[:40] + "..."
+            })
+
+            # Stage 1 Safety Check: Immediately after Reddit Ingestion
+            safety_res = safety_analyzer.check_safety(
+                title=post.title,
+                body=post.selftext,
+                stage="After Ingestion"
+            )
+
+            if not safety_res["passed"]:
+                logger.warning(f"Post {post.id} rejected at Stage 1 Ingestion safety check. Reason: {safety_res['reason']}")
+                log_rejected_post(
+                    post_id=post.id,
+                    subreddit=post.subreddit,
+                    risk_score=safety_res["risk_score"],
+                    category=", ".join(safety_res["categories_detected"]) or "safety_policy_violation",
+                    reason=safety_res["reason"]
+                )
+                continue  # Skip and fetch another Reddit post automatically
+
+            # Step 2: Narration Scripting
+            log_stage_start("Script Generation")
+            narration_mode = args.mode or config.NARRATION_MODE
+            try:
+                script_data = generate_script_with_fallback(post, narration_mode, style)
+                narration = script_data["narration"]
+                caption_title = script_data["title"]
+                emphasis = script_data["emphasis"]
+            except Exception as e:
+                log_stage_error("Script Generation", f"Script generation failed: {e}. Trying another post.")
+                continue
+
+            log_stage_finish("Script Generation", {
+                "title": caption_title,
+                "word_count": len(narration.split()),
+                "emphasis_count": len(emphasis)
+            })
+            logger.info(f"Generated Script Text:\n{narration}\nEmphasis: {emphasis}")
+
+            # Step 2.5: Optimize Metadata for Engagement
+            from src.upload.metadata import generate_optimized_metadata
+            optimized_meta = generate_optimized_metadata(
+                post=post,
+                narration=narration,
+                llm_title=script_data.get("yt_title", ""),
+                llm_hook=script_data.get("yt_hook", ""),
+                llm_summary=script_data.get("yt_summary", ""),
+                llm_category=script_data.get("yt_category", ""),
+                llm_content_tags=script_data.get("yt_content_tags", [])
+            )
+
+            # Stage 2 Safety Check: After narration generation
+            safety_res = safety_analyzer.check_safety(
+                title=post.title,
+                body=post.selftext,
+                narration=narration,
+                yt_title=optimized_meta["title"],
+                description=optimized_meta["description"],
+                tags=optimized_meta["tags"],
+                captions=caption_title,
+                stage="After Narration"
+            )
+
+            if not safety_res["passed"]:
+                logger.warning(f"Post {post.id} rejected at Stage 2 Narration safety check. Reason: {safety_res['reason']}")
+                log_rejected_post(
+                    post_id=post.id,
+                    subreddit=post.subreddit,
+                    risk_score=safety_res["risk_score"],
+                    category=", ".join(safety_res["categories_detected"]) or "safety_policy_violation",
+                    reason=safety_res["reason"]
+                )
+                continue  # Skip and fetch another Reddit post automatically
+
+            # Stage 3 Safety Check: Before rendering
+            safety_res = safety_analyzer.check_safety(
+                title=post.title,
+                body=post.selftext,
+                narration=narration,
+                yt_title=optimized_meta["title"],
+                description=optimized_meta["description"],
+                tags=optimized_meta["tags"],
+                captions=caption_title,
+                stage="Before Rendering"
+            )
+
+            if not safety_res["passed"]:
+                logger.warning(f"Post {post.id} rejected at Stage 3 Pre-Rendering safety check. Reason: {safety_res['reason']}")
+                log_rejected_post(
+                    post_id=post.id,
+                    subreddit=post.subreddit,
+                    risk_score=safety_res["risk_score"],
+                    category=", ".join(safety_res["categories_detected"]) or "safety_policy_violation",
+                    reason=safety_res["reason"]
+                )
+                continue  # Skip and fetch another Reddit post automatically
+
+            # If we reach this point, the post is safe and validated
+            logger.info(f"🎉 Post {post.id} passed all pre-rendering safety gates! Proceeding to rendering.")
+            break
+        else:
+            error_msg = f"Failed to ingest a safe Reddit post after {max_attempts} attempts."
             log_stage_error("Reddit Ingestion", error_msg, fatal=True)
             sys.exit(1)
-            
-        log_stage_finish("Reddit Ingestion", {
-            "id": post.id, 
-            "subreddit": post.subreddit, 
-            "title": post.title[:40] + "..."
-        })
-
-        # ── Step 2: Narration Scripting ──────────────────────
-        log_stage_start("Script Generation")
-        narration_mode = args.mode or config.NARRATION_MODE
-        script_data = generate_script_with_fallback(post, narration_mode, style)
-        narration = script_data["narration"]
-        caption_title = script_data["title"]
-        emphasis = script_data["emphasis"]
-        
-        log_stage_finish("Script Generation", {
-            "title": caption_title,
-            "word_count": len(narration.split()),
-            "emphasis_count": len(emphasis)
-        })
-        logger.info(f"Generated Script Text:\n{narration}\nEmphasis: {emphasis}")
-
-        # ── Step 2.5: Optimize Metadata for Engagement ───────
-        from src.upload.metadata import generate_optimized_metadata
-        optimized_meta = generate_optimized_metadata(
-            post=post,
-            narration=narration,
-            llm_title=script_data.get("yt_title", ""),
-            llm_hook=script_data.get("yt_hook", ""),
-            llm_summary=script_data.get("yt_summary", ""),
-            llm_category=script_data.get("yt_category", ""),
-            llm_content_tags=script_data.get("yt_content_tags", [])
-        )
 
         # ── Step 3: Background Clip Selection ────────────────
         log_stage_start("Background Selection")
@@ -157,7 +248,7 @@ def main() -> None:
             error_msg = "Could not retrieve background video clip"
             log_stage_error("Background Selection", error_msg, fatal=True)
             sys.exit(1)
-            
+
         log_stage_finish("Background Selection", {"filename": bg_clip.name})
 
         # ── Step 4: Reddit Card Overlay Image ────────────────
@@ -214,20 +305,41 @@ def main() -> None:
         video_id = ""
         if not args.no_upload:
             log_stage_start("YouTube Upload")
-            
-            video_id = upload_short(
-                video_path=video_path,
-                title=optimized_meta["title"],
+
+            # Stage 4 Safety Check: Immediately before upload
+            logger.info("Content Safety Stage 4: Performing final pre-upload validation...")
+            safety_res = safety_analyzer.check_safety(
+                yt_title=optimized_meta["title"],
                 description=optimized_meta["description"],
                 tags=optimized_meta["tags"],
-                category_id=optimized_meta["category_id"],
-                privacy=args.privacy
+                metadata={"category_id": optimized_meta["category_id"]},
+                stage="Before Upload"
             )
-            
-            if video_id:
-                log_stage_finish("YouTube Upload", {"video_id": video_id})
+
+            if not safety_res["passed"]:
+                logger.error(f"Post {post.id} REJECTED at final Stage 4 Pre-Upload check! Aborting upload. Reason: {safety_res['reason']}")
+                log_rejected_post(
+                    post_id=post.id,
+                    subreddit=post.subreddit,
+                    risk_score=safety_res["risk_score"],
+                    category=", ".join(safety_res["categories_detected"]) or "safety_policy_violation",
+                    reason=safety_res["reason"]
+                )
+                log_stage_error("YouTube Upload", f"Upload aborted due to safety policy violation: {safety_res['reason']}")
             else:
-                log_stage_error("YouTube Upload", "Upload failed")
+                video_id = upload_short(
+                    video_path=video_path,
+                    title=optimized_meta["title"],
+                    description=optimized_meta["description"],
+                    tags=optimized_meta["tags"],
+                    category_id=optimized_meta["category_id"],
+                    privacy=args.privacy
+                )
+
+                if video_id:
+                    log_stage_finish("YouTube Upload", {"video_id": video_id})
+                else:
+                    log_stage_error("YouTube Upload", "Upload failed")
         else:
             log_stage_start("YouTube Upload")
             log_stage_finish("YouTube Upload", {"status": "skipped"})

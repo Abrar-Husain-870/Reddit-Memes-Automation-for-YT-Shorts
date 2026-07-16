@@ -337,3 +337,90 @@ Emphasis: ['LOCK', 'SWIPED', 'DIALED', 'POLICE']
 2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
 2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
 2026-07-09 01:15:28,313 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
+2026-07-09 18:57:02,542 [INFO] RedditShortsPipeline: Uploads today: 0 (Limit: 4)
+2026-07-09 18:57:02,543 [INFO] RedditShortsPipeline: Upload limit check bypassed due to force flag
+2026-07-09 18:57:02,544 [INFO] RedditShortsPipeline: Uploads today: 0 (Limit: 4)
+2026-07-09 18:57:02,544 [INFO] RedditShortsPipeline: Scheduler Check: Most recent slot was 2026-07-09 17:00
+2026-07-09 18:57:02,545 [INFO] RedditShortsPipeline: Scheduler Check: Approved (no upload found since slot 17:00)
+2026-07-09 18:57:02,545 [INFO] RedditShortsPipeline: Upload limit check bypassed due to force flag
+2026-07-09 18:57:02,545 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-09 18:57:09,402 [INFO] RedditShortsPipeline: Uploads today: 4 (Limit: 4)
+2026-07-09 18:57:09,403 [INFO] RedditShortsPipeline: Upload limit check bypassed due to force flag
+2026-07-09 18:57:09,403 [INFO] RedditShortsPipeline: Uploads today: 4 (Limit: 4)
+2026-07-09 18:57:09,403 [INFO] RedditShortsPipeline: Scheduler Check: Blocked (daily limit of 4 uploads reached)
+2026-07-09 18:57:09,404 [INFO] RedditShortsPipeline: Upload limit check bypassed due to force flag
+2026-07-09 18:57:09,404 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 19:12:25,138 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 19:12:30,036 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:30,064 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 19:12:30,064 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 19:12:30,064 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 19:12:30,934 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:30,936 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Reject, Categories: ['Suicide or self-harm']
+2026-07-16 19:12:30,936 [WARNING] RedditShortsPipeline: Local scan flagged 'Reject' content, overriding LLM risk score 'Reject'.
+2026-07-16 19:12:30,936 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=False, Risk=Reject, AllowedMax=low
+2026-07-16 19:12:30,936 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 19:12:31,805 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:31,807 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: High Risk, Categories: ['Murder']
+2026-07-16 19:12:31,807 [WARNING] RedditShortsPipeline: Local scan flagged 'Reject' content, overriding LLM risk score 'High Risk'.
+2026-07-16 19:12:31,807 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=False, Risk=Reject, AllowedMax=low
+2026-07-16 19:12:31,809 [INFO] RedditShortsPipeline: Successfully logged rejected post test_post_123 to database.
+2026-07-16 19:12:47,853 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-16 19:12:47,878 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 0 (Limit: 4)
+2026-07-16 19:12:47,878 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-16 19:12:47,878 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.03s | Metadata: {'should_run': True}
+2026-07-16 19:12:47,890 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-16 19:12:47,890 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-16 19:12:47,916 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/Unexpected
+2026-07-16 19:12:49,342 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://www.reddit.com/r/Unexpected/top.json
+2026-07-16 19:12:50,500 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/Unexpected: 403 Client Error: Blocked for url: https://www.reddit.com/r/Unexpected/top.json?t=week
+2026-07-16 19:12:50,522 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://www.reddit.com/r/Unexpected/.rss
+2026-07-16 19:12:52,226 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/Unexpected - ID: 1ux68c2 - Title: A lot of information in the same video....
+2026-07-16 19:12:52,226 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 4.34s | Metadata: {'id': '1ux68c2', 'subreddit': 'Unexpected', 'title': 'A lot of information in the same video....'}
+2026-07-16 19:12:52,226 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-07-16 19:12:54,479 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:54,506 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 19:12:54,506 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 19:12:54,506 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Script Generation
+2026-07-16 19:12:55,059 [INFO] RedditShortsPipeline: Sending request to Groq model: llama-3.1-8b-instant
+2026-07-16 19:12:55,909 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:55,915 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Script Generation in 1.41s | Metadata: {'title': '24 HOURS IN 60 SECONDS', 'word_count': 107, 'emphasis_count': 5}
+2026-07-16 19:12:55,915 [INFO] RedditShortsPipeline: Generated Script Text:
+You won't believe what I recorded in just one minute. I was at a library conference, and a guy had this AMAZING idea to explain the entire FUTURE OF EDUCATION in under a minute. He started talking about AI, VR, and the INTERNET OF THINGS. Then, he dropped a bombshell about how the WORLD'S FIRST 3D-PRINTED SCHOOL would revolutionize education. I was stunned. The next thing I knew, he was introducing a NEW LANGUAGE that combines 10 different languages into one. It was like he was TIME-TRAVELING through the world of education. I was blown away by the sheer amount of INNOVATION packed into just 60 seconds.
+Emphasis: ['FUTURE OF EDUCATION', 'INTERNET OF THINGS', "WORLD'S FIRST", 'NEW LANGUAGE', 'TIME-TRAVELING']
+2026-07-16 19:12:55,926 [INFO] RedditShortsPipeline: Generating optimized metadata for Short...
+2026-07-16 19:12:55,927 [INFO] RedditShortsPipeline: Metadata generated successfully:
+2026-07-16 19:12:55,927 [INFO] RedditShortsPipeline:    Optimized Title: What Happened in 60 Seconds Will Blow Your Mind!
+2026-07-16 19:12:55,927 [INFO] RedditShortsPipeline:    Category ID: 27
+2026-07-16 19:12:55,927 [INFO] RedditShortsPipeline:    Tags Count: 20
+2026-07-16 19:12:55,927 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-07-16 19:12:56,806 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:56,808 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 19:12:56,808 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 19:12:56,808 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: Before Rendering)...
+2026-07-16 19:12:57,664 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-16 19:12:57,666 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-07-16 19:12:57,666 [INFO] RedditShortsPipeline: Safety check results (Stage: Before Rendering): Passed=True, Risk=Safe, AllowedMax=low
+2026-07-16 19:12:57,666 [INFO] RedditShortsPipeline: 🎉 Post 1ux68c2 passed all pre-rendering safety gates! Proceeding to rendering.
+2026-07-16 19:12:57,666 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Background Selection
+2026-07-16 19:12:57,687 [INFO] RedditShortsPipeline: Selected background clip: 'Xj5jNjhiXao_clip_045.mp4' (used 0 times previously)
+2026-07-16 19:12:57,688 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Background Selection in 0.02s | Metadata: {'filename': 'Xj5jNjhiXao_clip_045.mp4'}
+2026-07-16 19:12:57,688 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Overlay Generation
+2026-07-16 19:12:57,844 [INFO] RedditShortsPipeline: Reddit card overlay generated at C:\Users\husai\Desktop\Reddit YT Shorts\Brain_Bot\data\output\reddit_card.png (900x250)
+2026-07-16 19:12:57,845 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Overlay Generation in 0.16s | Metadata: {'path': 'C:\\Users\\husai\\Desktop\\Reddit YT Shorts\\Brain_Bot\\data\\output\\reddit_card.png'}
+2026-07-16 19:12:57,846 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Voice Synthesis
+2026-07-16 19:12:57,849 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-GuyNeural)
+2026-07-16 19:13:10,005 [INFO] RedditShortsPipeline: Generated Edge TTS voiceover: 38.28s (8 sentences)
+2026-07-16 19:13:10,005 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Voice Synthesis in 12.16s | Metadata: {'duration_s': 38.28, 'sentences': 8}
+2026-07-16 19:13:10,005 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Video Rendering
+2026-07-16 19:13:10,076 [INFO] RedditShortsPipeline: Rendering pipeline: Background 'Xj5jNjhiXao_clip_045.mp4' | Audio duration: 38.28s
+2026-07-16 19:13:10,079 [INFO] RedditShortsPipeline: Running FFmpeg render (60 FPS, presets: medium, output: final_short.mp4)
+2026-07-16 19:14:36,988 [INFO] RedditShortsPipeline: ✔ Short rendered successfully: final_short.mp4 (37.69MB, 60fps)
+2026-07-16 19:14:36,988 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Video Rendering in 86.98s | Metadata: {'output_video': 'C:\\Users\\husai\\Desktop\\Reddit YT Shorts\\Brain_Bot\\data\\output\\final_short.mp4'}
+2026-07-16 19:14:36,988 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Database Update
+2026-07-16 19:14:36,991 [INFO] RedditShortsPipeline: Saved Reddit ID 1ux68c2 to history database
+2026-07-16 19:14:36,993 [INFO] RedditShortsPipeline: Updated background usage: Xj5jNjhiXao_clip_045.mp4 has been used 1 time(s)
+2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Database Update in 0.01s
+2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
+2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
+2026-07-16 19:14:36,994 [INFO] RedditShortsPipeline: Cleaning up temporary render files...

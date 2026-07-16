@@ -1,0 +1,10 @@
+[
+  {
+    "reddit_id": "test_post_123",
+    "subreddit": "AskReddit",
+    "risk_score": "Reject",
+    "detection_category": "suicide_or_self_harm",
+    "reason": "Matched suicide and self-harm keywords locally",
+    "timestamp": "2026-07-16T13:42:31Z"
+  }
+]

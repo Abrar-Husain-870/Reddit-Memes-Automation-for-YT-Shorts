@@ -176,3 +176,8 @@ UPLOAD_SCHEDULE_TIMES = [
 # ── Instagram (Legacy compatibility / Manual instructions) ───
 IG_USERNAME = _env("IG_USERNAME", "")
 IG_PASSWORD = _env("IG_PASSWORD", "")
+
+# ── Content Safety Settings ──────────────────────────────────
+ENABLE_CONTENT_SAFETY = _env_bool("ENABLE_CONTENT_SAFETY", True)
+SAFETY_MODE = _env("SAFETY_MODE", "strict").lower().strip()  # strict, standard, lenient
+MAX_ALLOWED_RISK = _env("MAX_ALLOWED_RISK", "low").lower().strip()  # safe, low, medium, high
