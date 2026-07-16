@@ -7,40 +7,40 @@ from src.reddit.models import RedditPost
 
 # Default Lists of Tags and Hashtags
 EVERGREEN_TAGS = [
-    "shorts", "youtubeshorts", "viral", "trending", "storytime", 
-    "ai narration", "reddit", "reddit shorts", "daily shorts", 
-    "viral shorts", "fyp", "recommended"
+    "shorts", "youtubeshorts", "viral", "trending", "memes", 
+    "funny memes", "reddit memes", "funny videos", "daily memes", 
+    "dank memes", "fyp", "reaction memes", "comedy", "humor", "relatable"
 ]
 
 DEFAULT_TRENDING_TAGS = [
-    "viral", "fyp", "shortvideo", "story", "dailycontent", "interesting", "mustwatch"
+    "viral", "fyp", "shortvideo", "funny", "memes", "comedy", "relatable", "lol", "humor"
 ]
 
 EVERGREEN_HASHTAGS = [
-    "#Shorts", "#StoryTime", "#Viral", "#Trending", "#Reddit", "#RedditStories"
+    "#Shorts", "#Memes", "#Funny", "#Comedy", "#Reddit", "#DankMemes", "#Relatable", "#Lol", "#Humor", "#CatMemes"
 ]
 
 # Curiosity-driven title templates if LLM title is missing or invalid
 TITLE_TEMPLATES = [
-    "The Ending Completely Changed My Mind...",
-    "I Wasn't Expecting This Reddit Story...",
-    "This Is Surprisingly Wholesome...",
-    "One Small Decision Changed Everything...",
-    "I Still Can't Believe This Happened...",
-    "This Reddit Story Had Me Stunned...",
-    "Nobody Expected It To End This Way...",
-    "A Simple Mistake Had Massive Consequences...",
-    "I'm Still Trying To Process This Story...",
-    "It Started Normal But Ended Wild..."
+    "This is way too relatable...",
+    "Why is this actually true?",
+    "I feel personally called out by this...",
+    "Who else does this every single time?",
+    "This made me laugh way too hard!",
+    "Expectation vs Reality is crazy...",
+    "I wasn't expecting that ending!",
+    "This is surprisingly wholesome...",
+    "My last brain cell trying to figure this out...",
+    "Wait for the end, it gets better..."
 ]
 
 # Call to Action (CTA) list
 CTA_LIST = [
-    "What would you do in this situation?",
-    "Share your thoughts in the comments below!",
-    "Would you have handled this differently?",
-    "Let me know your opinions below.",
-    "Tell me what you think in the comments!"
+    "Who can relate to this? Let me know below!",
+    "Tag a friend who is exactly like this!",
+    "Has this ever happened to you? Tell me below!",
+    "Share your favorite part in the comments!",
+    "Rate this meme from 1 to 10 in the comments!"
 ]
 
 # Mapping human-readable categories to YouTube category IDs

@@ -9,9 +9,9 @@ import config
 from src.logger import logger
 
 HASHTAGS_POOL = [
-    "#Shorts", "#Reddit", "#RedditStories", "#AskReddit", "#RedditReads", 
-    "#Storytime", "#RedditMemes", "#Viral", "#Fyp", "#Trending",
-    "#Satisfying", "#Parkour", "#Minecraft", "#SubwaySurfers", "#Story"
+    "#Shorts", "#Reddit", "#RedditMemes", "#Viral", "#Fyp", "#Trending",
+    "#Comedy", "#Funny", "#Memes", "#Relatable", "#Lol", "#Humor", 
+    "#CatMemes", "#Jokes", "#Wholesome"
 ]
 
 YOUTUBE_API_TIMEOUT = 120
