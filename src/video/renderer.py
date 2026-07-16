@@ -217,104 +217,38 @@ def render_short(
     clean_narration = narration.replace("**", "").replace("__", "").replace("*", "")
     clean_narration = re.sub(r'[^\w\s\'",.!?;:\-]', "", clean_narration).strip()
     words = [w for w in clean_narration.split() if w.strip()]
-    
-    # Base layout dimensions
-    target_meme_h = 1440
-    target_cat_h = 480
-    y_list = None
-    
-    # Get Meme Image dimensions
-    mw, mh = 1080, 1080
+    # Get Meme Image dimensions and scale to fit in [1000x1200] area centered in the lower space [320, 1920]
+    scale_w_meme = 1080
+    scale_h_meme = 1080
     if overlay_card_path and overlay_card_path.exists():
         try:
             mw, mh = _get_image_dimensions(overlay_card_path)
         except Exception as e:
             logger.warning(f"Failed to read image dimensions for {overlay_card_path}: {e}. Using default square.")
-    mar = mw / mh
-    
-    # Adaptive Aspect Ratio calculations for Cat Reactions layout
-    if is_cat_clip and overlay_card_path and overlay_card_path.exists():
-        # Get Cat Reaction video dimensions
-        cw, ch = 1920, 1080
-        try:
-            cw, ch = _get_video_dimensions(clip_path)
-        except Exception as e:
-            logger.warning(f"Failed to read video dimensions for {clip_path}: {e}. Using default landscape.")
-        car = cw / ch
-        
-        # Determine the target proportions dynamically
-        target_meme_h_raw = config.MEME_LAYOUT_HEIGHT * 1920
-        target_cat_h_raw = config.CAT_LAYOUT_HEIGHT * 1920
-        
-        if mar > 1.2 and car < 0.9:  # Landscape meme + Portrait cat (make cat taller, meme shorter)
-            target_meme_h_raw = 0.65 * 1920
-            target_cat_h_raw = 0.35 * 1920
-        elif mar < 0.8 and car > 1.2:  # Portrait meme + Landscape cat (make meme taller, cat shorter)
-            target_meme_h_raw = 0.80 * 1920
-            target_cat_h_raw = 0.20 * 1920
-            
-        target_meme_h = make_even(target_meme_h_raw)
-        target_cat_h = make_even(target_cat_h_raw)
-        
-        # Calculate optimal scale bounds for meme to fit inside (1080 x target_meme_h)
-        scale_w_meme = 1080
-        scale_h_meme = int(1080 / mar)
-        if scale_h_meme > target_meme_h:
-            scale_h_meme = target_meme_h
-            scale_w_meme = int(target_meme_h * mar)
+            mw, mh = 1080, 1080
+        mar = mw / mh
+        max_w = 1000
+        max_h = 1200
+        scale_w_meme = max_w
+        scale_h_meme = int(max_w / mar)
+        if scale_h_meme > max_h:
+            scale_h_meme = max_h
+            scale_w_meme = int(max_h * mar)
         scale_w_meme = make_even(scale_w_meme)
         scale_h_meme = make_even(scale_h_meme)
         
-        # Calculate optimal scale bounds for cat video to fit inside (1080 x target_cat_h)
-        scale_w_cat = 1080
-        scale_h_cat = int(1080 / car)
-        if scale_h_cat > target_cat_h:
-            scale_h_cat = target_cat_h
-            scale_w_cat = int(target_cat_h * car)
-        scale_w_cat = make_even(scale_w_cat)
-        scale_h_cat = make_even(scale_h_cat)
-        
-        # Calculate subtitle centers to reside inside the cat section
-        cat_center_y = target_meme_h + (target_cat_h / 2)
-        y_list = [
-            make_even(cat_center_y - 30),
-            make_even(cat_center_y),
-            make_even(cat_center_y + 30),
-            make_even(cat_center_y - 15),
-            make_even(cat_center_y + 15)
-        ]
-    else:
-        # Fallback Mode: calculate Y positions to guarantee no overlap with centered meme
-        max_h = 1400
-        scale_factor = min(1000 / mw, max_h / mh, 1.0)
-        scaled_h = mh * scale_factor
-        y_end = (1920 + scaled_h) / 2
-        
-        # If the meme is very tall and leaves less than 280px at the bottom, scale it down to 1200 max height
-        if (1920 - y_end) < 280:
-            max_h = 1200
-            scale_factor = min(1000 / mw, max_h / mh, 1.0)
-            scaled_h = mh * scale_factor
-            y_end = (1920 + scaled_h) / 2
+    # Subtitles are placed in the top 320px area (centered around y = 160px from top, which is MarginV = 1760)
+    y_list = [1730, 1760, 1790, 1745, 1775]
+    
+    # Get Cat Reaction video dimensions if is_cat_clip is True
+    car = 16 / 9
+    if is_cat_clip:
+        try:
+            cw, ch = _get_video_dimensions(clip_path)
+            car = cw / ch
+        except Exception as e:
+            logger.warning(f"Failed to read video dimensions for {clip_path}: {e}. Using default landscape.")
             
-        scale_w_meme_fb = make_even(mw * scale_factor)
-        scale_h_meme_fb = make_even(mh * scale_factor)
-        
-        bottom_space_center = y_end + (1920 - y_end) / 2
-        
-        # Define y_list centered in bottom space, keeping inside 1920 boundaries
-        y_list = [
-            make_even(bottom_space_center - 30),
-            make_even(bottom_space_center),
-            make_even(bottom_space_center + 30),
-            make_even(bottom_space_center - 15),
-            make_even(bottom_space_center + 15)
-        ]
-        
-        # Clamp values so they don't draw off-screen (max 1860, min y_end + 45)
-        min_allowable_y = int(y_end + 45)
-        y_list = [min(1860, max(y, min_allowable_y)) for y in y_list]
-        
     # Map timestamps and build subtitle ASS file
     timings = _build_word_timings(words, audio_dur, sentence_timings)
     ass_content = _build_ass_subtitles(timings, style, emphasis_words, alternate_y=y_list)
@@ -348,36 +282,42 @@ def render_short(
             f"[cat_frozen_raw][cat_moving]overlay=enable='gt(t,{freeze_dur})':eof_action=pass[cat_combined]"
         )
         
-        # 1. Composite Cat Box (blurred background + centered scaled foreground with zoom pop transition)
-        filter_chains.append(
-            f"[cat_combined]scale=1080:{target_cat_h}:force_original_aspect_ratio=increase,crop=1080:{target_cat_h},boxblur=20:5[cat_bg]"
-        )
-        
-        # Dynamic zoom pop transition expression (12% zoom at the moment of transition)
+        # 1. Composite Cat Background (blurred background + centered scaled foreground with zoom pop transition)
         zoom_expr = f"1.0 + 0.12 * max(0, 1 - (t - {freeze_dur})/0.2) * between(t, {freeze_dur}, {freeze_dur} + 0.2)"
-        filter_chains.append(
-            f"[cat_combined]scale=w='{scale_w_cat} * ({zoom_expr})':h='{scale_h_cat} * ({zoom_expr})':eval=frame[cat_fg]"
-        )
-        filter_chains.append(
-            f"[cat_bg][cat_fg]overlay=x=(1080-w)/2:y=({target_cat_h}-h)/2[cat_box]"
-        )
+        scale_h_cat = make_even(int(1080 / car))
         
-        # 2. Composite Meme Box (blurred background + centered scaled foreground + float bobbing animation)
+        if config.OVERLAY_BACKGROUND_BLUR:
+            filter_chains.append(
+                f"[cat_combined]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=25:5[cat_bg]"
+            )
+            filter_chains.append(
+                f"[cat_combined]scale=w='1080 * ({zoom_expr})':h='{scale_h_cat} * ({zoom_expr})':eval=frame[cat_fg]"
+            )
+            filter_chains.append(
+                f"[cat_bg][cat_fg]overlay=x=(1080-w)/2:y=(1920-h)/2[v_base]"
+            )
+        else:
+            # Calculate cover sizes
+            if car > (1080/1920):
+                scale_h_cover = 1920
+                scale_w_cover = int(1920 * car)
+            else:
+                scale_w_cover = 1080
+                scale_h_cover = int(1080 / car)
+            scale_w_cover = make_even(scale_w_cover)
+            scale_h_cover = make_even(scale_h_cover)
+            filter_chains.append(
+                f"[cat_combined]scale=w='{scale_w_cover} * ({zoom_expr})':h='{scale_h_cover} * ({zoom_expr})':eval=frame,crop=1080:1920[v_base]"
+            )
+            
+        # 2. Composite Meme Box Centered vertically in the lower space [320, 1920] (center at y=1120)
         filter_chains.append(
-            f"[2:v]scale=1080:{target_meme_h}:force_original_aspect_ratio=increase,crop=1080:{target_meme_h},boxblur=30:5[meme_bg]"
+            f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_scaled]"
         )
         filter_chains.append(
-            f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_fg]"
+            f"[v_base][meme_scaled]overlay=x=(1080-w)/2:y='1120-h/2 + 10*sin(2*PI*t/3.0)'[v_meme]"
         )
-        filter_chains.append(
-            f"[meme_bg][meme_fg]overlay=x=(1080-w)/2:y='({target_meme_h}-h)/2 + 10*sin(2*PI*t/3.0)'[meme_box]"
-        )
-        
-        # 3. Stack Meme Box (top) and Cat Box (bottom)
-        filter_chains.append(
-            f"[meme_box][cat_box]vstack=inputs=2[v_layout]"
-        )
-        last_v_tag = "v_layout"
+        last_v_tag = "v_meme"
         
     else:
         # Fallback to standard gameplay background composition (2 inputs)
@@ -406,14 +346,14 @@ def render_short(
             
         last_v_tag = "v_base"
         
-        # Add Meme Image Centered Overlay
+        # Add Meme Image overlay centered in the lower space [320, 1920] (center at y=1120)
         if overlay_card_path and overlay_card_path.exists():
             inputs.extend(["-i", str(overlay_card_path)])
             filter_chains.append(
-                f"[2:v]scale={scale_w_meme_fb}:{scale_h_meme_fb}[meme_scaled]"
+                f"[2:v]scale={scale_w_meme}:{scale_h_meme}[meme_scaled]"
             )
             filter_chains.append(
-                f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y=(1920-h)/2[v_meme]"
+                f"[{last_v_tag}][meme_scaled]overlay=x=(1080-w)/2:y='1120-h/2 + 10*sin(2*PI*t/3.0)'[v_meme]"
             )
             last_v_tag = "v_meme"
             

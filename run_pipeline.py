@@ -86,7 +86,11 @@ def main() -> None:
 
         # ── Step 0: Scheduler Gatekeeping ────────────────────
         log_stage_start("Scheduler Check")
-        should_run = check_scheduler_run(force=args.force)
+        if args.no_upload:
+            should_run = True
+            logger.info("Scheduler Check: Bypassed (--no-upload specified)")
+        else:
+            should_run = check_scheduler_run(force=args.force)
         log_stage_finish("Scheduler Check", {"should_run": should_run})
         
         if not should_run:
