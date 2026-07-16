@@ -729,3 +729,220 @@ Emphasis: ['GOOD OLD EXPENSIVE']
 2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
 2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
 2026-07-16 23:41:37,185 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
+2026-07-17 00:34:27,152 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Scheduler Check
+2026-07-17 00:34:27,176 [INFO] RedditShortsPipeline: Uploads in last 24 hours: 2 (Limit: 4)
+2026-07-17 00:34:27,176 [INFO] RedditShortsPipeline: Scheduler Check: Forced run requested
+2026-07-17 00:34:27,177 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Scheduler Check in 0.02s | Metadata: {'should_run': True}
+2026-07-17 00:34:27,189 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 1/15)...
+2026-07-17 00:34:27,190 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-17 00:34:27,240 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/wholesomememes
+2026-07-17 00:34:30,307 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://old.reddit.com/r/wholesomememes/top.json
+2026-07-17 00:34:31,855 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/wholesomememes: 403 Client Error: Blocked for url: https://old.reddit.com/r/wholesomememes/top.json?t=week
+2026-07-17 00:34:31,874 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://old.reddit.com/r/wholesomememes/.rss
+2026-07-17 00:34:33,793 [INFO] RedditShortsPipeline: 🎉 Selected Reddit Post: r/wholesomememes - ID: 1ut1bux - Title: Space Flirting...
+2026-07-17 00:34:33,793 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 6.60s | Metadata: {'id': '1ut1bux', 'subreddit': 'wholesomememes', 'title': 'Space Flirting...'}
+2026-07-17 00:34:33,793 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.redd.it/sft5uwfv3hch1.png
+2026-07-17 00:34:35,099 [INFO] RedditShortsPipeline: Meme image successfully saved to C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.png (190580 bytes)
+2026-07-17 00:34:35,102 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-07-17 00:34:42,662 [WARNING] RedditShortsPipeline: Safety check with image failed (404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.). Falling back to text-only safety scan.
+2026-07-17 00:34:43,638 [WARNING] RedditShortsPipeline: LLM content safety check failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.. Traceback: Traceback (most recent call last):
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\grpc_helpers.py", line 55, in error_remapped_callable
+    return callable_(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 276, in __call__
+    response, ignored_call = self._with_call(
+                             ~~~~~~~~~~~~~~~^
+        request,
+        ^^^^^^^^
+    ...<4 lines>...
+        compression=compression,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 331, in _with_call
+    return call.result(), call
+           ~~~~~~~~~~~^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 438, in result
+    raise self
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 314, in continuation
+    response, call = self._thunk(new_method).with_call(
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        request,
+        ^^^^^^^^
+    ...<4 lines>...
+        compression=new_compression,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 1173, in with_call
+    return _end_unary_response_blocking(state, call, True, None)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 990, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.NOT_FOUND
+	details = "models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+	debug_error_string = "NOT_FOUND:models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+>
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 115, in _call_llm
+    return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, image_path)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 224, in _call_llm_internal
+    response = model.generate_content(
+        contents,
+    ...<3 lines>...
+        )
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\generativeai\generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+        request,
+        **request_options,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 835, in generate_content
+    response = rpc(
+        request,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\gapic_v1\method.py", line 128, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+        target,
+    ...<3 lines>...
+        on_error=on_error,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+        exc,
+    ...<6 lines>...
+        timeout,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_base.py", line 216, in _retry_error_helper
+    raise final_exc from source_exc
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 147, in retry_target
+    result = target()
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\grpc_helpers.py", line 57, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.NotFound: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\grpc_helpers.py", line 55, in error_remapped_callable
+    return callable_(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 276, in __call__
+    response, ignored_call = self._with_call(
+                             ~~~~~~~~~~~~~~~^
+        request,
+        ^^^^^^^^
+    ...<4 lines>...
+        compression=compression,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 331, in _with_call
+    return call.result(), call
+           ~~~~~~~~~~~^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 438, in result
+    raise self
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_interceptor.py", line 314, in continuation
+    response, call = self._thunk(new_method).with_call(
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        request,
+        ^^^^^^^^
+    ...<4 lines>...
+        compression=new_compression,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 1173, in with_call
+    return _end_unary_response_blocking(state, call, True, None)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\grpc\_channel.py", line 990, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.NOT_FOUND
+	details = "models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+	debug_error_string = "NOT_FOUND:models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+>
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 276, in run_llm_scan
+    response_text = self._call_llm(system_prompt, user_prompt, image_path)
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 119, in _call_llm
+    return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, None)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\Desktop\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 224, in _call_llm_internal
+    response = model.generate_content(
+        contents,
+    ...<3 lines>...
+        )
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\generativeai\generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+        request,
+        **request_options,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 835, in generate_content
+    response = rpc(
+        request,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\gapic_v1\method.py", line 128, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+        target,
+    ...<3 lines>...
+        on_error=on_error,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+        exc,
+    ...<6 lines>...
+        timeout,
+    )
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_base.py", line 216, in _retry_error_helper
+    raise final_exc from source_exc
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\retry\retry_unary.py", line 147, in retry_target
+    result = target()
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\site-packages\google\api_core\grpc_helpers.py", line 57, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.NotFound: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+
+2026-07-17 00:34:43,639 [ERROR] RedditShortsPipeline: Contextual LLM safety scan error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+2026-07-17 00:34:43,639 [WARNING] RedditShortsPipeline: Failing safe: LLM check failed in strict safety mode. Rejecting content.
+2026-07-17 00:34:43,639 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=False, Risk=Reject, AllowedMax=low
+2026-07-17 00:34:43,639 [WARNING] RedditShortsPipeline: Post 1ut1bux rejected at Stage 1 Ingestion safety check. Reason: Strict mode fail-safe: Contextual safety check API failed/timed out. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+2026-07-17 00:34:43,642 [INFO] RedditShortsPipeline: Successfully logged rejected post 1ut1bux to database.
+2026-07-17 00:34:43,642 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 2/15)...
+2026-07-17 00:34:43,642 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-07-17 00:34:43,669 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/dankmemes
+2026-07-17 00:34:43,669 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://old.reddit.com/r/dankmemes/top.json
+2026-07-17 00:34:43,986 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/dankmemes: 403 Client Error: Blocked for url: https://old.reddit.com/r/dankmemes/top.json?t=week
+2026-07-17 00:34:43,988 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://old.reddit.com/r/dankmemes/.rss
+2026-07-17 00:34:45,591 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/dankmemes: 429 Client Error: Too Many Requests for url: https://old.reddit.com/r/dankmemes/.rss
+2026-07-17 00:34:45,592 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-17 00:34:50,592 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/me_irl
+2026-07-17 00:34:50,592 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://old.reddit.com/r/me_irl/top.json
+2026-07-17 00:34:51,180 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/me_irl: 403 Client Error: Blocked for url: https://old.reddit.com/r/me_irl/top.json?t=week
+2026-07-17 00:34:51,182 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://old.reddit.com/r/me_irl/.rss
+2026-07-17 00:34:52,759 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/me_irl: 429 Client Error: Too Many Requests for url: https://old.reddit.com/r/me_irl/.rss
+2026-07-17 00:34:52,759 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
+2026-07-17 00:34:57,759 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/meme
+2026-07-17 00:34:57,759 [INFO] RedditShortsPipeline: Fetching posts from anonymous Reddit feed: https://old.reddit.com/r/meme/top.json
+2026-07-17 00:34:58,299 [WARNING] RedditShortsPipeline: Public Reddit API fetch failed for r/meme: 403 Client Error: Blocked for url: https://old.reddit.com/r/meme/top.json?t=week
+2026-07-17 00:34:58,301 [INFO] RedditShortsPipeline: Fetching posts from anonymous RSS feed: https://old.reddit.com/r/meme/.rss
+2026-07-17 00:34:59,279 [WARNING] RedditShortsPipeline: RSS feed fetch failed for r/meme: 429 Client Error: Too Many Requests for url: https://old.reddit.com/r/meme/.rss
+2026-07-17 00:34:59,279 [INFO] RedditShortsPipeline: Pausing for 5.0s to respect Reddit rate limits...
