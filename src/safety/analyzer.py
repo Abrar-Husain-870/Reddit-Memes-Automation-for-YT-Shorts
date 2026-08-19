@@ -130,38 +130,52 @@ class ContentSafetyAnalyzer:
                 raise ValueError("GROQ_API_KEY is not configured")
             client = Groq(api_key=config.GROQ_API_KEY)
             
-            actual_model = model_name
-            if image_path:
-                import base64
-                with open(image_path, "rb") as img_f:
-                    b64_img = base64.b64encode(img_f.read()).decode('utf-8')
-                user_content = [
-                    {"type": "text", "text": user_prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{b64_img}"
+            models_to_try = [model_name, "llama-3.3-70b-versatile", "gemma2-9b-it", "mixtral-8x7b-32768", "llama-3.2-3b-preview"]
+            seen = set()
+            models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+            
+            last_err = None
+            for model_candidate in models_to_try:
+                actual_model = model_candidate
+                if image_path:
+                    import base64
+                    with open(image_path, "rb") as img_f:
+                        b64_img = base64.b64encode(img_f.read()).decode('utf-8')
+                    user_content = [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{b64_img}"
+                            }
                         }
-                    }
-                ]
-                # Check if model is vision-capable; if not, fallback to Llama 3.2 11B Vision
-                is_vision_model = any(k in model_name.lower() for k in ["vision", "scout", "qwen3.6-27b"])
-                if not is_vision_model:
-                    actual_model = "llama-3.2-11b-vision-preview"
-            else:
-                user_content = user_prompt
-                
-            completion = client.chat.completions.create(
-                model=actual_model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_content},
-                ],
-                temperature=0.0,
-                max_tokens=300,
-                timeout=15,
-            )
-            return completion.choices[0].message.content or ""
+                    ]
+                    is_vision_model = any(k in actual_model.lower() for k in ["vision", "scout", "qwen3.6-27b"])
+                    if not is_vision_model:
+                        actual_model = "llama-3.2-11b-vision-preview"
+                else:
+                    user_content = user_prompt
+
+                try:
+                    completion = client.chat.completions.create(
+                        model=actual_model,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_content},
+                        ],
+                        temperature=0.0,
+                        max_tokens=300,
+                        timeout=15,
+                    )
+                    return completion.choices[0].message.content or ""
+                except Exception as e:
+                    last_err = e
+                    if "404" in str(e) or "model_not_found" in str(e):
+                        logger.warning(f"Groq model '{actual_model}' returned 404. Trying fallback model...")
+                        continue
+                    raise e
+            if last_err:
+                raise last_err
             
         elif provider in ("openai", "deepseek", "openrouter", "ollama"):
             import openai
@@ -217,23 +231,39 @@ class ContentSafetyAnalyzer:
             if not config.GEMINI_API_KEY:
                 raise ValueError("GEMINI_API_KEY is not configured")
             genai.configure(api_key=config.GEMINI_API_KEY)
-            model = genai.GenerativeModel(
-                model_name=model_name,
-                system_instruction=system_prompt
-            )
-            contents = [user_prompt]
-            if image_path:
-                from PIL import Image
-                img = Image.open(image_path)
-                contents.append(img)
-            response = model.generate_content(
-                contents,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.0,
-                    max_output_tokens=300,
-                )
-            )
-            return response.text or ""
+
+            models_to_try = [model_name, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+            seen = set()
+            models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
+            last_err = None
+            for g_model in models_to_try:
+                try:
+                    model = genai.GenerativeModel(
+                        model_name=g_model,
+                        system_instruction=system_prompt
+                    )
+                    contents = [user_prompt]
+                    if image_path:
+                        from PIL import Image
+                        img = Image.open(image_path)
+                        contents.append(img)
+                    response = model.generate_content(
+                        contents,
+                        generation_config=genai.types.GenerationConfig(
+                            temperature=0.0,
+                            max_output_tokens=300,
+                        )
+                    )
+                    return response.text or ""
+                except Exception as e:
+                    last_err = e
+                    if "404" in str(e) or "not found" in str(e).lower():
+                        logger.warning(f"Gemini model '{g_model}' returned 404. Trying fallback model...")
+                        continue
+                    raise e
+            if last_err:
+                raise last_err
         else:
             raise ValueError(f"Unsupported LLM provider: {provider}")
 
