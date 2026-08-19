@@ -67,17 +67,11 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      # ── 3. System Dependencies ───────────────────────────────────────────────
-      - name: Install FFmpeg & fonts
-        run: |
-          if ! command -v ffmpeg &> /dev/null; then
-            export DEBIAN_FRONTEND=noninteractive
-            sudo apt-get update -y
-            sudo apt-get install -y ffmpeg fonts-liberation
-          else
-            echo "FFmpeg is already installed: $(ffmpeg -version | head -n 1)"
-          fi
-          fc-cache -fv
+      # ── 3. System Dependencies (Fast static binary download, zero apt-get hangs) ──
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          ffmpeg-version: release
 
       # ── 4. Python Dependencies ───────────────────────────────────────────────
       - name: Install Python dependencies
