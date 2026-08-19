@@ -107,10 +107,18 @@ OPENAI_API_KEY = _env("OPENAI_API_KEY", "")
 OPENROUTER_API_KEY = _env("OPENROUTER_API_KEY", "")
 OLLAMA_API_URL = _env("OLLAMA_API_URL", "http://localhost:11434/v1")
 
+# Model deprecation / migration aliases
+DEPRECATED_MODEL_ALIASES = {
+    "llama-3.1-8b-instant": "llama-3.3-70b-versatile",
+    "llama3-8b-8192": "llama-3.3-70b-versatile",
+    "llama3-70b-8192": "llama-3.3-70b-versatile",
+    "llama-3.1-70b-versatile": "llama-3.3-70b-versatile",
+}
+
 # Resolve default model names if none is provided
 if not LLM_MODEL:
     if LLM_PROVIDER == "groq":
-        LLM_MODEL = "llama-3.1-8b-instant"
+        LLM_MODEL = "llama-3.3-70b-versatile"
     elif LLM_PROVIDER == "deepseek":
         LLM_MODEL = "deepseek-chat"
     elif LLM_PROVIDER == "gemini":
@@ -118,11 +126,15 @@ if not LLM_MODEL:
     elif LLM_PROVIDER == "openai":
         LLM_MODEL = "gpt-4o-mini"
     elif LLM_PROVIDER == "openrouter":
-        LLM_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+        LLM_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
     elif LLM_PROVIDER == "ollama":
         LLM_MODEL = "llama3"
     else:
-        LLM_MODEL = "llama-3.1-8b-instant"
+        LLM_MODEL = "llama-3.3-70b-versatile"
+
+# Automatically alias deprecated model names if passed via .env or GitHub Secrets
+if LLM_MODEL in DEPRECATED_MODEL_ALIASES:
+    LLM_MODEL = DEPRECATED_MODEL_ALIASES[LLM_MODEL]
 
 # ── Voice / TTS Settings ─────────────────────────────────────
 TTS_PROVIDER = _env("TTS_PROVIDER", "edge")  # edge, elevenlabs, openai, azure, fish, xtts

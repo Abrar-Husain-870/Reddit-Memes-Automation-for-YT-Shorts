@@ -144,10 +144,10 @@ class ContentSafetyAnalyzer:
                         }
                     }
                 ]
-                # Check if model is vision-capable; if not, fallback to Llama 4 Scout
+                # Check if model is vision-capable; if not, fallback to Llama 3.2 11B Vision
                 is_vision_model = any(k in model_name.lower() for k in ["vision", "scout", "qwen3.6-27b"])
                 if not is_vision_model:
-                    actual_model = "meta-llama/llama-4-scout-17b-16e-instruct"
+                    actual_model = "llama-3.2-11b-vision-preview"
             else:
                 user_content = user_prompt
                 

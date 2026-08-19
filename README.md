@@ -44,7 +44,7 @@ Copy `.env.example` to `.env` and fill in your keys and preferences.
 | `REDDIT_SORT` | `top` | Post sorting (`top`, `hot`, `rising`, `new`) |
 | `NARRATION_MODE` | `commentary` | Script style (`natural` or `commentary`) |
 | `LLM_PROVIDER` | `groq` | Provider (`groq`, `gemini`, `openai`, `deepseek`, `openrouter`, `ollama`) |
-| `LLM_MODEL` | `llama-3.1-8b-instant` | Model name corresponding to LLM provider |
+| `LLM_MODEL` | `llama-3.3-70b-versatile` | Model name corresponding to LLM provider |
 | `TTS_PROVIDER` | `edge` | Voice synthesiser (`edge`, `elevenlabs`, `openai`) |
 | `BACKGROUND_PROVIDERS`| `minecraft parkour gameplay 1080p` | Search terms for downloading background clips |
 | `MAX_VIDEOS_PER_DAY` | `4` | Limit on successful daily uploads |
