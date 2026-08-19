@@ -242,6 +242,8 @@ def _fetch_with_rss(subreddit: str) -> List[dict]:
             extractor = HTMLTextExtractor()
             extractor.feed(html_content)
             selftext = extractor.get_text().strip()
+            selftext = _re.sub(r"submitted by\s+/u/\S+.*", "", selftext, flags=_re.IGNORECASE).strip()
+            selftext = _re.sub(r"\[link\]|\[comments\]", "", selftext, flags=_re.IGNORECASE).strip()
             
             # Extract image URL from RSS HTML content.
             # We ONLY want direct image URLs (i.redd.it or i.imgur.com) to guarantee high-quality memes
@@ -346,6 +348,8 @@ def _fetch_with_rss2json(subreddit: str) -> List[dict]:
             extractor = HTMLTextExtractor()
             extractor.feed(html_content)
             selftext = extractor.get_text().strip()
+            selftext = _re.sub(r"submitted by\s+/u/\S+.*", "", selftext, flags=_re.IGNORECASE).strip()
+            selftext = _re.sub(r"\[link\]|\[comments\]", "", selftext, flags=_re.IGNORECASE).strip()
             
             # Extract image URL
             image_url = ""

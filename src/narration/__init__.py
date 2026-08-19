@@ -52,30 +52,42 @@ def generate_script_with_fallback(
             raise ValueError("Generated script is too short or empty")
             
     except Exception as e:
-        logger.warning(f"LLM script generation failed ({e}). Using local regex cleanup fallback.")
+        logger.warning(f"LLM script generation failed ({e}). Using local meme review reaction fallback.")
+        import random
+        import re
         
-        # Local fallback: read the post naturally by cleaning it up
         clean_title = strip_markdown(strip_emojis(post.title))
-        clean_body = strip_markdown(strip_emojis(post.selftext))
+        # Strip any RSS metadata remnants from body if present
+        clean_body = re.sub(r"submitted by\s+/u/\S+.*", "", strip_markdown(strip_emojis(post.selftext)), flags=re.IGNORECASE).strip()
+        clean_body = re.sub(r"\[link\]|\[comments\]", "", clean_body, flags=re.IGNORECASE).strip()
         
-        # Truncate content to fit 45-90 seconds (approx 120-150 words)
-        words = f"{clean_title}. {clean_body}".split()
-        if len(words) > 180:
-            narration = " ".join(words[:180]) + "..."
+        # Meme commentary hook templates for viral short-form reaction
+        commentary_templates = [
+            "Wait, why is this meme ACTUALLY so relatable? {title}.",
+            "Okay, who AUTHORIZED this level of relatable content? {title}.",
+            "I had to read this meme TWICE to get it. {title}.",
+            "This represents my ENTIRE life in one single image. {title}.",
+            "There is NO WAY this actually happened. {title}.",
+            "Why does this meme HIT so hard though? {title}."
+        ]
+        
+        if clean_body and len(clean_body.split()) >= 4 and "submitted by" not in clean_body.lower():
+            narration = f"{clean_title}. {clean_body}"
         else:
-            narration = " ".join(words)
+            template = random.choice(commentary_templates)
+            narration = template.format(title=clean_title)
             
         title = clean_title[:55]
         emphasis = extract_emphasis_from_text(narration, limit=4)
         
-        logger.info("Local fallback narration generated successfully")
+        logger.info("Local meme commentary fallback narration generated successfully")
         return {
             "title": title,
             "narration": narration,
             "emphasis": emphasis,
-            "yt_title": "",
-            "yt_hook": "",
-            "yt_summary": "",
-            "yt_category": "",
-            "yt_content_tags": []
+            "yt_title": f"{clean_title} #shorts #meme",
+            "yt_hook": f"Check out this meme from r/{post.subreddit}!",
+            "yt_summary": clean_title,
+            "yt_category": "Entertainment",
+            "yt_content_tags": ["memes", "funny", "shorts", post.subreddit]
         }
