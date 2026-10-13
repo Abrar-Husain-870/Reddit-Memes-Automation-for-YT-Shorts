@@ -54,9 +54,15 @@ CATEGORY_MAPPING = {
 }
 
 def clean_title(title: str) -> str:
-    """Clean title to remove quotes, excessive caps, and enforce all-age guidelines."""
+    """Clean title to remove quotes, excessive caps, r/source mentions, and enforce clean formatting."""
     # Remove surrounding quotes
     title = title.strip('\'"“”')
+    # Remove r/subreddit or [r/subreddit] patterns
+    title = re.sub(r'\b[rR]/[a-zA-Z0-9_+]+[\s|:–—-]*', '', title)
+    title = re.sub(r'\[[rR]/[a-zA-Z0-9_+]+\][\s|:–—-]*', '', title)
+    title = re.sub(r'\b(from\s+)?reddit[\s|:–—-]*', '', title, flags=re.IGNORECASE)
+    # Strip any leading/trailing pipe, colon, dash, or whitespace
+    title = re.sub(r'^[\s|:–—-]+|[\s|:–—-]+$', '', title)
     # If title is in ALL CAPS, convert to Title Case
     if title.isupper():
         title = title.title()
@@ -79,25 +85,23 @@ def generate_optimized_metadata(
     """
     logger.info("Generating optimized metadata for Short...")
     
-    # ── 1. TITLE GENERATION ─────────────────────────────────────────────────
+    # ── 1. TITLE GENERATION (PLAIN, EASY TO UNDERSTAND, NO r/ OR SOURCE) ───
     title = ""
     if llm_title:
         title = clean_title(llm_title)
         
-    # If LLM title is missing or doesn't meet size requirements (40-70 chars preferred)
-    if not title or len(title) < 30 or len(title) > 85:
-        # Generate dynamic curiosity title based on subreddit/keywords
-        template = random.choice(TITLE_TEMPLATES)
-        sub_name = post.subreddit.replace("wholesomememes", "Wholesome").replace("tifu", "TIFU")
-        candidate = f"r/{sub_name} | {template}"
-        
-        if 40 <= len(candidate) <= 75:
-            title = candidate
-        else:
-            title = template
+    # If LLM title is missing, too short, or too long, pick a plain, engaging title
+    if not title or len(title) < 15 or len(title) > 85:
+        # Use clean curiosity title templates without any subreddit/source mention
+        title = random.choice(TITLE_TEMPLATES)
+    else:
+        title = clean_title(title)
+        if not title:
+            title = random.choice(TITLE_TEMPLATES)
 
-    # Enforce hard YouTube Title limit (100 chars max, cropped to 70 for Shorts optimal views)
-    title = title[:75]
+    # Enforce hard YouTube Title limit (cropped to 75 chars max for Shorts optimal views)
+    title = title[:75].strip()
+
     
     # ── 2. DESCRIPTION GENERATION ───────────────────────────────────────────
     # Description Hook (1-2 lines)

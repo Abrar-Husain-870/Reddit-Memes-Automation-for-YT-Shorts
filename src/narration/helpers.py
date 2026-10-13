@@ -111,12 +111,22 @@ def parse_structured_response(response: str, default_title: str = "Reddit Story"
         # If no tags, assume the entire response is the narration
         result["narration"] = response.strip()
         
-    # Clean up formatting
+    # Clean up formatting and strip any r/ or source mentions from titles
     result["narration"] = strip_markdown(strip_emojis(result["narration"]))
-    result["title"] = strip_markdown(strip_emojis(result["title"]))
-    result["yt_title"] = strip_markdown(strip_emojis(result["yt_title"]))
+    
+    clean_t = re.sub(r'\b[rR]/[a-zA-Z0-9_+]+[\s|:–—-]*', '', strip_markdown(strip_emojis(result["title"])))
+    clean_t = re.sub(r'\[[rR]/[a-zA-Z0-9_+]+\][\s|:–—-]*', '', clean_t)
+    clean_t = re.sub(r'\b(from\s+)?reddit[\s|:–—-]*', '', clean_t, flags=re.IGNORECASE)
+    result["title"] = re.sub(r'^[\s|:–—-]+|[\s|:–—-]+$', '', clean_t).strip()
+
+    clean_yt = re.sub(r'\b[rR]/[a-zA-Z0-9_+]+[\s|:–—-]*', '', strip_markdown(strip_emojis(result["yt_title"])))
+    clean_yt = re.sub(r'\[[rR]/[a-zA-Z0-9_+]+\][\s|:–—-]*', '', clean_yt)
+    clean_yt = re.sub(r'\b(from\s+)?reddit[\s|:–—-]*', '', clean_yt, flags=re.IGNORECASE)
+    result["yt_title"] = re.sub(r'^[\s|:–—-]+|[\s|:–—-]+$', '', clean_yt).strip()
+
     result["yt_hook"] = strip_markdown(strip_emojis(result["yt_hook"]))
     result["yt_summary"] = strip_markdown(strip_emojis(result["yt_summary"]))
+
     
     # Generate fallback emphasis if none was specified
     if not result["emphasis"]:

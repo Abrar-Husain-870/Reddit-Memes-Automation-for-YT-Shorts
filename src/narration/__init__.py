@@ -56,7 +56,24 @@ def generate_script_with_fallback(
         import random
         import re
         
-        clean_title = strip_markdown(strip_emojis(post.title))
+        # Clean post title to remove any r/ or subreddit prefixes
+        clean_title = re.sub(r'\b[rR]/[a-zA-Z0-9_+]+[\s|:–—-]*', '', strip_markdown(strip_emojis(post.title)))
+        clean_title = re.sub(r'\[[rR]/[a-zA-Z0-9_+]+\][\s|:–—-]*', '', clean_title)
+        clean_title = re.sub(r'\b(from\s+)?reddit[\s|:–—-]*', '', clean_title, flags=re.IGNORECASE)
+        clean_title = re.sub(r'^[\s|:–—-]+|[\s|:–—-]+$', '', clean_title).strip()
+
+        # If title is trivial, empty, or just a subreddit name, pick an easy plain title
+        if not clean_title or clean_title.lower() in ("me_irl", "meirl", "dankmemes", "memes", "funny", "wholesomememes", "an interesting title"):
+            plain_title = random.choice([
+                "This is way too relatable...",
+                "Why is this actually true?",
+                "I wasn't expecting that ending!",
+                "Who else does this every single time?",
+                "This made me laugh way too hard!"
+            ])
+        else:
+            plain_title = clean_title[:60]
+
         # Strip any RSS metadata remnants from body if present
         clean_body = re.sub(r"submitted by\s+/u/\S+.*", "", strip_markdown(strip_emojis(post.selftext)), flags=re.IGNORECASE).strip()
         clean_body = re.sub(r"\[link\]|\[comments\]", "", clean_body, flags=re.IGNORECASE).strip()
@@ -72,22 +89,22 @@ def generate_script_with_fallback(
         ]
         
         if clean_body and len(clean_body.split()) >= 4 and "submitted by" not in clean_body.lower():
-            narration = f"{clean_title}. {clean_body}"
+            narration = f"{plain_title}. {clean_body}"
         else:
             template = random.choice(commentary_templates)
-            narration = template.format(title=clean_title)
+            narration = template.format(title=plain_title)
             
-        title = clean_title[:55]
         emphasis = extract_emphasis_from_text(narration, limit=4)
         
         logger.info("Local meme commentary fallback narration generated successfully")
         return {
-            "title": title,
+            "title": plain_title,
             "narration": narration,
             "emphasis": emphasis,
-            "yt_title": f"{clean_title} #shorts #meme",
-            "yt_hook": f"Check out this meme from r/{post.subreddit}!",
-            "yt_summary": clean_title,
+            "yt_title": plain_title,
+            "yt_hook": "Wait till you see this...",
+            "yt_summary": plain_title,
             "yt_category": "Entertainment",
-            "yt_content_tags": ["memes", "funny", "shorts", post.subreddit]
+            "yt_content_tags": ["memes", "funny", "shorts"]
         }
+
