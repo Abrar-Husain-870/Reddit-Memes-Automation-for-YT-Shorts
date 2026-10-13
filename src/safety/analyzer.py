@@ -109,7 +109,7 @@ class ContentSafetyAnalyzer:
         # If performing a vision check and Gemini key is configured, route to Gemini as it supports vision on the free tier
         if image_path and config.GEMINI_API_KEY:
             provider = "gemini"
-            model_name = "gemini-2.0-flash"
+            model_name = "gemini-3.8-flash"
         else:
             provider = orig_provider
             model_name = orig_model_name
@@ -118,8 +118,12 @@ class ContentSafetyAnalyzer:
             return self._call_llm_internal(provider, model_name, system_prompt, user_prompt, image_path)
         except Exception as e:
             if image_path:
-                logger.warning(f"Safety check with image failed ({e}). Falling back to text-only safety scan.")
-                return self._call_llm_internal(orig_provider, orig_model_name, system_prompt, user_prompt, None)
+                logger.warning(f"Safety check with image via {provider} failed ({e}). Trying fallback with image...")
+                try:
+                    return self._call_llm_internal(orig_provider, orig_model_name, system_prompt, user_prompt, image_path)
+                except Exception as img_err:
+                    logger.warning(f"Vision safety check failed on fallback ({img_err}). Falling back to text-only safety scan.")
+                    return self._call_llm_internal(orig_provider, orig_model_name, system_prompt, user_prompt, None)
             else:
                 raise e
 
@@ -237,7 +241,7 @@ class ContentSafetyAnalyzer:
             if not config.GEMINI_API_KEY:
                 raise ValueError("GEMINI_API_KEY is not configured")
 
-            models_to_try = [model_name, "gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+            models_to_try = [model_name, "gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
             seen = set()
             models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
 
@@ -530,6 +534,23 @@ class ContentSafetyAnalyzer:
                 family_friendly == "pass" and
                 requires_bk == "no"
             )
+
+            # Check if rejection was due to missing image context in a text-only fallback
+            reason_text = str(data.get("reason", "")).lower()
+            missing_image_context = any(phrase in reason_text for phrase in [
+                "no image", "without an image", "without image", "only of a title", "only a title",
+                "no visual context", "lacks visual", "lacks any visual", "missing image", "without visual",
+                "only consists of a title", "consists only of a title"
+            ])
+
+            if missing_image_context and not passed:
+                # If content is family-friendly and doesn't require deep niche knowledge, do not reject solely because image wasn't supplied
+                if family_friendly == "pass" and requires_bk != "yes":
+                    passed = True
+                    logger.info(
+                        f"Meme suitability evaluation lacked image context ('{data.get('reason')}'). "
+                        "Passed by default to prevent blocking valid post."
+                    )
             
             logger.info(
                 f"Meme suitability evaluation: passed={passed} | "

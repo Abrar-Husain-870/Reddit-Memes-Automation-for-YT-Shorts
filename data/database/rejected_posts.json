@@ -46,5 +46,21 @@
     "detection_category": "meme_suitability_filter",
     "reason": "The meme relies on a common understanding of the Trump presidency and the concept of irony.",
     "timestamp": "2026-07-16T23:37:43Z"
+  },
+  {
+    "reddit_id": "1x4tuxf",
+    "subreddit": "blursedimages",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme relies on the visual absurdity of a 'blursed' (blessed/cursed) door, which is easily understood by a general audience without needing specific context.",
+    "timestamp": "2026-10-13T17:12:33Z"
+  },
+  {
+    "reddit_id": "1x4rk8e",
+    "subreddit": "memes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The provided title is a generic meta-commentary that lacks any visual context, specific joke, or relatable scenario, making it impossible to evaluate as a standalone humorous meme.",
+    "timestamp": "2026-10-13T17:12:57Z"
   }
 ]

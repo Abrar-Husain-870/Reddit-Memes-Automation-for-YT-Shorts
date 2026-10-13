@@ -28,7 +28,7 @@ class GeminiProvider(BaseLLMProvider):
         system_prompt = SYSTEM_PROMPT_COMMENTARY if mode == "commentary" else SYSTEM_PROMPT_NATURAL
         user_prompt = get_user_prompt(post.subreddit, post.title, post.selftext)
 
-        models_to_try = [config.LLM_MODEL, "gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+        models_to_try = [config.LLM_MODEL, "gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
         seen = set()
         models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
 

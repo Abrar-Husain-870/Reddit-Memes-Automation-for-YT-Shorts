@@ -117,7 +117,9 @@ DEPRECATED_MODEL_ALIASES = {
     "gemma2-9b-it": "qwen/qwen3.8-27b",
     "mixtral-8x7b-32768": "qwen/qwen3.8-27b",
     "llama-3.2-3b-preview": "qwen/qwen3.8-27b",
-    "gemini-1.5-flash": "gemini-2.0-flash",
+    "gemini-1.5-flash": "gemini-3.8-flash",
+    "gemini-2.0-flash": "gemini-3.8-flash",
+    "gemini-2.5-flash": "gemini-3.8-flash",
 }
 
 # Resolve default model names if none is provided
@@ -127,7 +129,7 @@ if not LLM_MODEL:
     elif LLM_PROVIDER == "deepseek":
         LLM_MODEL = "deepseek-chat"
     elif LLM_PROVIDER == "gemini":
-        LLM_MODEL = "gemini-2.0-flash"
+        LLM_MODEL = "gemini-3.8-flash"
     elif LLM_PROVIDER == "openai":
         LLM_MODEL = "gpt-4o-mini"
     elif LLM_PROVIDER == "openrouter":
