@@ -109,7 +109,7 @@ class ContentSafetyAnalyzer:
         # If performing a vision check and Gemini key is configured, route to Gemini as it supports vision on the free tier
         if image_path and config.GEMINI_API_KEY:
             provider = "gemini"
-            model_name = "gemini-1.5-flash"
+            model_name = "gemini-2.0-flash"
         else:
             provider = orig_provider
             model_name = orig_model_name
@@ -130,7 +130,13 @@ class ContentSafetyAnalyzer:
                 raise ValueError("GROQ_API_KEY is not configured")
             client = Groq(api_key=config.GROQ_API_KEY)
             
-            models_to_try = [model_name, "llama-3.3-70b-versatile", "gemma2-9b-it", "mixtral-8x7b-32768", "llama-3.2-3b-preview"]
+            models_to_try = [
+                model_name, 
+                "openai/gpt-oss-120b", 
+                "openai/gpt-oss-20b", 
+                "qwen/qwen3.8-27b", 
+                "llama-3.3-70b-versatile"
+            ]
             seen = set()
             models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
             
@@ -150,9 +156,9 @@ class ContentSafetyAnalyzer:
                             }
                         }
                     ]
-                    is_vision_model = any(k in actual_model.lower() for k in ["vision", "scout", "qwen3.6-27b"])
+                    is_vision_model = any(k in actual_model.lower() for k in ["vision", "scout", "qwen3.6-27b", "gpt-oss"])
                     if not is_vision_model:
-                        actual_model = "llama-3.2-11b-vision-preview"
+                        actual_model = "openai/gpt-oss-20b"
                 else:
                     user_content = user_prompt
 
@@ -170,8 +176,9 @@ class ContentSafetyAnalyzer:
                     return completion.choices[0].message.content or ""
                 except Exception as e:
                     last_err = e
-                    if "404" in str(e) or "model_not_found" in str(e):
-                        logger.warning(f"Groq model '{actual_model}' returned 404. Trying fallback model...")
+                    err_str = str(e).lower()
+                    if any(k in err_str for k in ("404", "400", "model_decommissioned", "not_found", "model_not_found", "deprecated", "does not exist")):
+                        logger.warning(f"Groq model '{actual_model}' unavailable ({e}). Trying fallback model...")
                         continue
                     raise e
             if last_err:
@@ -227,45 +234,73 @@ class ContentSafetyAnalyzer:
             return completion.choices[0].message.content or ""
             
         elif provider == "gemini":
-            import google.generativeai as genai
             if not config.GEMINI_API_KEY:
                 raise ValueError("GEMINI_API_KEY is not configured")
-            genai.configure(api_key=config.GEMINI_API_KEY)
 
-            models_to_try = [model_name, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+            models_to_try = [model_name, "gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
             seen = set()
             models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
 
-            last_err = None
-            for g_model in models_to_try:
-                try:
-                    model = genai.GenerativeModel(
-                        model_name=g_model,
-                        system_instruction=system_prompt
-                    )
-                    contents = [user_prompt]
-                    if image_path:
-                        from PIL import Image
-                        img = Image.open(image_path)
-                        contents.append(img)
-                    response = model.generate_content(
-                        contents,
-                        generation_config=genai.types.GenerationConfig(
-                            temperature=0.0,
-                            max_output_tokens=300,
+            # Prefer modern google.genai SDK
+            try:
+                from google import genai
+                client = genai.Client(api_key=config.GEMINI_API_KEY)
+                last_err = None
+                for g_model in models_to_try:
+                    try:
+                        contents = [user_prompt]
+                        if image_path:
+                            from PIL import Image
+                            img = Image.open(image_path)
+                            contents.append(img)
+                        response = client.models.generate_content(
+                            model=g_model,
+                            contents=contents,
+                            config=dict(
+                                system_instruction=system_prompt,
+                                temperature=0.0,
+                                max_output_tokens=300,
+                            )
                         )
-                    )
-                    return response.text or ""
-                except Exception as e:
-                    last_err = e
-                    if "404" in str(e) or "not found" in str(e).lower():
-                        logger.warning(f"Gemini model '{g_model}' returned 404. Trying fallback model...")
+                        return response.text or ""
+                    except Exception as e:
+                        last_err = e
+                        logger.warning(f"google.genai model '{g_model}' failed ({e}). Trying fallback model...")
                         continue
-                    raise e
-            if last_err:
-                raise last_err
+                if last_err:
+                    raise last_err
+            except ImportError:
+                import google.generativeai as genai
+                genai.configure(api_key=config.GEMINI_API_KEY)
+                last_err = None
+                for g_model in models_to_try:
+                    try:
+                        model = genai.GenerativeModel(
+                            model_name=g_model,
+                            system_instruction=system_prompt
+                        )
+                        contents = [user_prompt]
+                        if image_path:
+                            from PIL import Image
+                            img = Image.open(image_path)
+                            contents.append(img)
+                        response = model.generate_content(
+                            contents,
+                            generation_config=genai.types.GenerationConfig(
+                                temperature=0.0,
+                                max_output_tokens=300,
+                            )
+                        )
+                        return response.text or ""
+                    except Exception as e:
+                        last_err = e
+                        logger.warning(f"Gemini model '{g_model}' returned error: {e}. Trying fallback model...")
+                        continue
+                if last_err:
+                    raise last_err
         else:
             raise ValueError(f"Unsupported LLM provider: {provider}")
+
 
     def run_llm_scan(self, text: str, image_path: Optional[Path] = None) -> Tuple[str, List[str], str]:
         """

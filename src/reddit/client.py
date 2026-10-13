@@ -215,8 +215,17 @@ def _fetch_with_rss(subreddit: str) -> List[dict]:
             logger.warning("Empty response from RSS feed")
             return []
             
-        root = ET.fromstring(response.content)
+        xml_text = response.content.decode("utf-8", errors="replace")
+        # Remove XML-invalid control characters
+        xml_text = _re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', xml_text)
+        try:
+            root = ET.fromstring(xml_text.encode("utf-8"))
+        except ET.ParseError:
+            # Repair unescaped ampersands and retry
+            repaired_xml = _re.sub(r'&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)', '&amp;', xml_text)
+            root = ET.fromstring(repaired_xml.encode("utf-8"))
         ns = {"atom": "http://www.w3.org/2005/Atom"}
+
         
         posts = []
         for entry in root.findall("atom:entry", ns):

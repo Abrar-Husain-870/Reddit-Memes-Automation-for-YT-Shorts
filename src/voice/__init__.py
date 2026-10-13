@@ -19,6 +19,9 @@ def get_voice_provider() -> BaseVoiceProvider:
     elif provider_name == "openai":
         from src.voice.openai_tts import OpenAITTSVoiceProvider
         return OpenAITTSVoiceProvider()
+    elif provider_name in ("gtts", "google"):
+        from src.voice.gtts_voice import GTTSVoiceProvider
+        return GTTSVoiceProvider()
     else:
         logger.warning(f"Unknown/unsupported voice provider '{config.TTS_PROVIDER}'. Defaulting to Edge.")
         from src.voice.edge import EdgeVoiceProvider
@@ -32,26 +35,53 @@ def synthesize_voiceover_with_fallback(
 ) -> Tuple[float, List[SentenceTiming]]:
     """
     Synthesize voiceover from text, saving to output_path.
-    If the configured provider fails, falls back to Edge TTS.
+    Tries configured TTS provider first, with multi-stage fallback (Edge TTS -> gTTS).
     """
     if output_path is None:
         output_path = config.OUTPUT_DIR / "voiceover.mp3"
         
+    configured_provider_name = config.TTS_PROVIDER.lower()
+    
+    # 1. Try configured provider
     try:
         provider = get_voice_provider()
         duration, timings = provider.synthesize(text, output_path, voice)
         return duration, timings
     except Exception as e:
-        logger.warning(f"Configured TTS provider '{config.TTS_PROVIDER}' failed: {e}. Falling back to Edge TTS.")
-        
-        # Override config settings temporarily for fallback
-        from src.voice.edge import EdgeVoiceProvider
-        fallback_provider = EdgeVoiceProvider()
-        fallback_voice = "en-US-AndrewNeural"
-        
+        logger.warning(f"Configured TTS provider '{config.TTS_PROVIDER}' failed: {e}.")
+
+    # 2. Try Edge TTS if it wasn't already the failing provider
+    if configured_provider_name != "edge":
+        logger.info("Attempting fallback to Edge TTS...")
         try:
+            from src.voice.edge import EdgeVoiceProvider
+            fallback_provider = EdgeVoiceProvider()
+            fallback_voice = "en-US-AndrewNeural"
             duration, timings = fallback_provider.synthesize(text, output_path, fallback_voice)
             return duration, timings
         except Exception as fe:
-            logger.error(f"Fallback Edge TTS also failed: {fe}")
-            raise fe
+            logger.warning(f"Fallback Edge TTS failed: {fe}")
+
+    # 3. Fallback to gTTS (Google Translate TTS - cloud-friendly, zero credentials required)
+    logger.info("Attempting fallback to Google TTS (gTTS)...")
+    try:
+        from src.voice.gtts_voice import GTTSVoiceProvider
+        gtts_provider = GTTSVoiceProvider()
+        duration, timings = gtts_provider.synthesize(text, output_path)
+        return duration, timings
+    except Exception as ge:
+        logger.error(f"Fallback gTTS also failed: {ge}")
+
+    # 4. Final attempt: OpenAI TTS if API key is present
+    if config.OPENAI_API_KEY:
+        try:
+            logger.info("Attempting fallback to OpenAI TTS...")
+            from src.voice.openai_tts import OpenAITTSVoiceProvider
+            openai_provider = OpenAITTSVoiceProvider()
+            duration, timings = openai_provider.synthesize(text, output_path)
+            return duration, timings
+        except Exception as oe:
+            logger.error(f"Fallback OpenAI TTS failed: {oe}")
+
+    raise RuntimeError("All TTS providers (configured, Edge TTS, gTTS) failed to synthesize audio.")
+

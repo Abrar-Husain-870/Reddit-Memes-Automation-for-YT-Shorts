@@ -109,20 +109,25 @@ OLLAMA_API_URL = _env("OLLAMA_API_URL", "http://localhost:11434/v1")
 
 # Model deprecation / migration aliases
 DEPRECATED_MODEL_ALIASES = {
-    "llama-3.1-8b-instant": "llama-3.3-70b-versatile",
-    "llama3-8b-8192": "llama-3.3-70b-versatile",
-    "llama3-70b-8192": "llama-3.3-70b-versatile",
-    "llama-3.1-70b-versatile": "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant": "qwen/qwen3.8-27b",
+    "llama-3.3-70b-versatile": "qwen/qwen3.8-27b",
+    "llama3-8b-8192": "qwen/qwen3.8-27b",
+    "llama3-70b-8192": "qwen/qwen3.8-27b",
+    "llama-3.1-70b-versatile": "qwen/qwen3.8-27b",
+    "gemma2-9b-it": "qwen/qwen3.8-27b",
+    "mixtral-8x7b-32768": "qwen/qwen3.8-27b",
+    "llama-3.2-3b-preview": "qwen/qwen3.8-27b",
+    "gemini-1.5-flash": "gemini-2.0-flash",
 }
 
 # Resolve default model names if none is provided
 if not LLM_MODEL:
     if LLM_PROVIDER == "groq":
-        LLM_MODEL = "llama-3.3-70b-versatile"
+        LLM_MODEL = "qwen/qwen3.8-27b"
     elif LLM_PROVIDER == "deepseek":
         LLM_MODEL = "deepseek-chat"
     elif LLM_PROVIDER == "gemini":
-        LLM_MODEL = "gemini-1.5-flash"
+        LLM_MODEL = "gemini-2.0-flash"
     elif LLM_PROVIDER == "openai":
         LLM_MODEL = "gpt-4o-mini"
     elif LLM_PROVIDER == "openrouter":
@@ -130,11 +135,13 @@ if not LLM_MODEL:
     elif LLM_PROVIDER == "ollama":
         LLM_MODEL = "llama3"
     else:
-        LLM_MODEL = "llama-3.3-70b-versatile"
+        LLM_MODEL = "qwen/qwen3.8-27b"
 
 # Automatically alias deprecated model names if passed via .env or GitHub Secrets
 if LLM_MODEL in DEPRECATED_MODEL_ALIASES:
     LLM_MODEL = DEPRECATED_MODEL_ALIASES[LLM_MODEL]
+
+
 
 # ── Voice / TTS Settings ─────────────────────────────────────
 TTS_PROVIDER = _env("TTS_PROVIDER", "edge")  # edge, elevenlabs, openai, azure, fish, xtts
