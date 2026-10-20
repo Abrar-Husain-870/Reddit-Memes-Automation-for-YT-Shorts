@@ -67,11 +67,11 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      # ── 3. System Dependencies (Fast static binary download, zero apt-get hangs) ──
-      - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
-        with:
-          ffmpeg-version: release
+      # ── 3. System Dependencies ───────────────────────────────────────────────
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
       # ── 4. Python Dependencies ───────────────────────────────────────────────
       - name: Install Python dependencies
