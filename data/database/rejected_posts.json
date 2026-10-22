@@ -78,5 +78,93 @@
     "detection_category": "llm_api_failure",
     "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)",
     "timestamp": "2026-10-22T07:03:39Z"
+  },
+  {
+    "reddit_id": "1x9c01q",
+    "subreddit": "me_irl",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)",
+    "timestamp": "2026-10-22T07:08:10Z"
+  },
+  {
+    "reddit_id": "1wuwt1x",
+    "subreddit": "AnimalsBeingDerps",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Unterminated string starting at: line 4 column 13 (char 67)",
+    "timestamp": "2026-10-22T07:08:32Z"
+  },
+  {
+    "reddit_id": "1xaih0p",
+    "subreddit": "dankmemes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The phrase 're-wipe' is specific gaming terminology (referring to resetting a game server) that requires niche knowledge to understand the context of the joke.",
+    "timestamp": "2026-10-22T07:09:10Z"
+  },
+  {
+    "reddit_id": "1x8dzvu",
+    "subreddit": "funny",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme relies on specific religious doomsday context and likely contains offensive or sensitive imagery associated with cults or extreme religious groups, failing the family-friendly criteria.",
+    "timestamp": "2026-10-22T07:10:08Z"
+  },
+  {
+    "reddit_id": "1xc2xe6",
+    "subreddit": "meirl",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Unterminated string starting at: line 2 column 17 (char 18)",
+    "timestamp": "2026-10-22T07:10:53Z"
+  },
+  {
+    "reddit_id": "1x7fpes",
+    "subreddit": "blursedimages",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Unterminated string starting at: line 2 column 17 (char 18)",
+    "timestamp": "2026-10-22T07:11:17Z"
+  },
+  {
+    "reddit_id": "1x8moy5",
+    "subreddit": "meme",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "It makes a simple, relatable shrinkflation joke using a well-known candy bar that everyone recognizes.",
+    "timestamp": "2026-10-22T07:12:29Z"
+  },
+  {
+    "reddit_id": "1x4yhb3",
+    "subreddit": "AdviceAnimals",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme is a simple, relatable expression of childhood fear or anxiety that is easy to understand and safe for all audiences.",
+    "timestamp": "2026-10-22T07:12:53Z"
+  },
+  {
+    "reddit_id": "1x941br",
+    "subreddit": "funny",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The title 'Just Being Logical' is a generic phrase that provides no visual context or specific joke, making it impossible to evaluate as a standalone meme without the missing image content.",
+    "timestamp": "2026-10-22T07:13:21Z"
+  },
+  {
+    "reddit_id": "1xc3jf8",
+    "subreddit": "dankmemes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme relies on a universally relatable daily struggle (fatigue) with minimal text, making it instantly understandable and safe for all audiences.",
+    "timestamp": "2026-10-22T07:24:51Z"
+  },
+  {
+    "reddit_id": "1xb8tw1",
+    "subreddit": "memes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The title is generic and lacks the visual context or specific reference needed to be funny or understandable without knowing the specific image or event being depicted.",
+    "timestamp": "2026-10-22T07:25:14Z"
   }
 ]
