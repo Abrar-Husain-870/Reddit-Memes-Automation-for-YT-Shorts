@@ -406,16 +406,73 @@ def _fetch_with_rss2json(subreddit: str) -> List[dict]:
         return []
 
 
+def _fetch_with_meme_api(subreddit: str, count: int = 50) -> List[dict]:
+    """Fetch posts using the public meme-api.com proxy (no API keys required)."""
+    subs = [s.strip() for s in subreddit.split("+") if s.strip()]
+    if not subs:
+        return []
+
+    # If a combined list was passed, sample up to 3 subreddits to fetch a diverse batch
+    if len(subs) > 1:
+        target_subs = random.sample(subs, min(3, len(subs)))
+        limit_per_sub = max(15, count // len(target_subs))
+    else:
+        target_subs = subs
+        limit_per_sub = count
+
+    all_posts = []
+    for sub in target_subs:
+        url = f"https://meme-api.com/gimme/{sub}/{limit_per_sub}"
+        logger.info(f"Fetching posts from public meme API for r/{sub}: {url}")
+        try:
+            resp = session_client.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                timeout=12
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            for item in data.get("memes", []):
+                post_link = item.get("postLink", "")
+                post_id = post_link.rstrip("/").split("/")[-1] if post_link else ""
+                if post_id.startswith("t3_"):
+                    post_id = post_id[3:]
+
+                all_posts.append({
+                    "id": post_id,
+                    "subreddit": item.get("subreddit", sub),
+                    "title": item.get("title", ""),
+                    "selftext": "",
+                    "score": item.get("ups", 1000),
+                    "num_comments": 50,
+                    "over_18": item.get("nsfw", False),
+                    "is_self": False,
+                    "permalink": post_link,
+                    "author": item.get("author", "[deleted]"),
+                    "pinned": False,
+                    "crosspost_parent": None,
+                    "url": item.get("url", "")
+                })
+        except Exception as e:
+            logger.warning(f"Public meme API fetch failed for r/{sub}: {e}")
+
+    return all_posts
+
+
 def fetch_posts(subreddit: str, sort: str = "top", time_filter: str = "week") -> List[RedditPost]:
     """Fetch posts from a subreddit, mapping them to RedditPost dataclasses."""
     raw_posts = _fetch_with_praw(subreddit, sort, time_filter)
-    
+
+    # If no PRAW credentials, prioritize keyless meme-api to bypass 403 cloud datacenter blocks
+    if not raw_posts:
+        raw_posts = _fetch_with_meme_api(subreddit)
+
     if not raw_posts:
         raw_posts = _fetch_anonymous_json(subreddit, sort, time_filter)
-        
+
     if not raw_posts:
         raw_posts = _fetch_with_rss(subreddit)
-        
+
     if not raw_posts:
         raw_posts = _fetch_with_rss2json(subreddit)
         
