@@ -62,5 +62,21 @@
     "detection_category": "meme_suitability_filter",
     "reason": "The provided title is a generic meta-commentary that lacks any visual context, specific joke, or relatable scenario, making it impossible to evaluate as a standalone humorous meme.",
     "timestamp": "2026-10-13T17:12:57Z"
+  },
+  {
+    "reddit_id": "1xb0r95",
+    "subreddit": "dankmemes",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 28 (char 29)",
+    "timestamp": "2026-10-22T07:02:20Z"
+  },
+  {
+    "reddit_id": "1x7s19r",
+    "subreddit": "AdviceAnimals",
+    "risk_score": "Reject",
+    "detection_category": "llm_api_failure",
+    "reason": "Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)",
+    "timestamp": "2026-10-22T07:03:39Z"
   }
 ]
