@@ -166,5 +166,45 @@
     "detection_category": "meme_suitability_filter",
     "reason": "The title is generic and lacks the visual context or specific reference needed to be funny or understandable without knowing the specific image or event being depicted.",
     "timestamp": "2026-10-22T07:25:14Z"
+  },
+  {
+    "reddit_id": "1xbnxbl",
+    "subreddit": "funny",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The title 'Sucker [OC]' is ambiguous and likely refers to a specific Original Character or niche community context, making it difficult for a general audience to understand without specific background knowledge.",
+    "timestamp": "2026-10-22T07:38:18Z"
+  },
+  {
+    "reddit_id": "1v77ng3",
+    "subreddit": "wholesomememes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The joke relies on specific internet slang ('unshrimp') and likely references a specific viral video or niche community context, making it obscure and difficult for a general audience to understand or find funny.",
+    "timestamp": "2026-10-22T07:38:41Z"
+  },
+  {
+    "reddit_id": "1xb6me5",
+    "subreddit": "memes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme relies on specific local cultural context or stereotypes regarding Chile that are not universally understood or relatable to a broad international audience.",
+    "timestamp": "2026-10-22T07:39:06Z"
+  },
+  {
+    "reddit_id": "1x9n1b4",
+    "subreddit": "wholesomememes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The caption is a relatable, low-stakes observation about the trade-off between cleanliness and fun, making it simple and broadly appealing without requiring specific context.",
+    "timestamp": "2026-10-22T07:39:27Z"
+  },
+  {
+    "reddit_id": "1x9obii",
+    "subreddit": "dankmemes",
+    "risk_score": "Low Appeal",
+    "detection_category": "meme_suitability_filter",
+    "reason": "The meme relies on a common trope of pets (likely a cat or dog) acting superior or dismissive towards their owner, which is easily understood and relatable to a broad audience without needing specific context.",
+    "timestamp": "2026-10-22T07:40:12Z"
   }
 ]

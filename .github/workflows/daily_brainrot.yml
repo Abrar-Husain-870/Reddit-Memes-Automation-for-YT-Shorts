@@ -71,7 +71,7 @@ jobs:
       - name: Install FFmpeg
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y --no-install-recommends ffmpeg
 
       # ── 4. Python Dependencies ───────────────────────────────────────────────
       - name: Install Python dependencies
