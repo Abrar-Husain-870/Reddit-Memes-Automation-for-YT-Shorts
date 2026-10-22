@@ -5383,3 +5383,161 @@ json.decoder.JSONDecodeError: Expecting value: line 2 column 16 (char 17)
 2026-10-22 12:32:05,793 [INFO] RedditShortsPipeline: Meme image successfully saved to E:\Web Dev\Complete FullStack deployed Projects\Latest apps\Reddit Bots\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.png (367243 bytes)
 2026-10-22 12:32:05,796 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
 2026-10-22 12:32:07,550 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:32:20,365 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 200 OK"
+2026-10-22 12:32:20,368 [INFO] google_genai.models: AFC remote call 1 is done.
+2026-10-22 12:32:20,369 [WARNING] google_genai.types: Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-10-22 12:32:20,374 [WARNING] RedditShortsPipeline: LLM content safety check failed: Expecting property name enclosed in double quotes: line 2 column 28 (char 29). Traceback: Traceback (most recent call last):
+  File "E:\Web Dev\Complete FullStack deployed Projects\Latest apps\Reddit Bots\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 366, in run_llm_scan
+    data = json.loads(cleaned)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 2 column 28 (char 29)
+
+2026-10-22 12:32:20,375 [ERROR] RedditShortsPipeline: Contextual LLM safety scan error: Expecting property name enclosed in double quotes: line 2 column 28 (char 29)
+2026-10-22 12:32:20,375 [WARNING] RedditShortsPipeline: Failing safe: LLM check failed in strict safety mode. Rejecting content.
+2026-10-22 12:32:20,376 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=False, Risk=Reject, AllowedMax=low
+2026-10-22 12:32:20,376 [WARNING] RedditShortsPipeline: Post 1xb0r95 rejected at Stage 1 Ingestion safety check. Reason: Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 28 (char 29)
+2026-10-22 12:32:20,382 [INFO] RedditShortsPipeline: Successfully logged rejected post 1xb0r95 to database.
+2026-10-22 12:32:20,383 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 4/15)...
+2026-10-22 12:32:20,385 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-10-22 12:32:20,406 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/memes+dankmemes+me_irl+funny+wholesomememes+AdviceAnimals+blursedimages+perfectlycutscreams+AnimalsBeingDerps+cats+dogs+meme+meirl
+2026-10-22 12:32:20,410 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/AdviceAnimals: https://meme-api.com/gimme/AdviceAnimals/16
+2026-10-22 12:32:20,739 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/meirl: https://meme-api.com/gimme/meirl/16
+2026-10-22 12:32:21,061 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/wholesomememes: https://meme-api.com/gimme/wholesomememes/16
+2026-10-22 12:32:21,409 [INFO] RedditShortsPipeline: 🎉 Weighted Selected Reddit Post: r/AdviceAnimals (base weight: 3.0) - ID: 1x7s19r - Title: Tesla really understands what consumers want...
+2026-10-22 12:32:21,409 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 1.02s | Metadata: {'id': '1x7s19r', 'subreddit': 'AdviceAnimals', 'title': 'Tesla really understands what consumers ...'}
+2026-10-22 12:32:21,410 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.imgur.com/q17ATgs.png
+2026-10-22 12:32:23,728 [INFO] RedditShortsPipeline: Meme image successfully saved to E:\Web Dev\Complete FullStack deployed Projects\Latest apps\Reddit Bots\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.png (1130409 bytes)
+2026-10-22 12:32:23,731 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-10-22 12:32:25,734 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:33:39,008 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 200 OK"
+2026-10-22 12:33:39,011 [INFO] google_genai.models: AFC remote call 1 is done.
+2026-10-22 12:33:39,011 [WARNING] google_genai.types: Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-10-22 12:33:39,018 [WARNING] RedditShortsPipeline: LLM content safety check failed: Expecting property name enclosed in double quotes: line 2 column 24 (char 25). Traceback: Traceback (most recent call last):
+  File "E:\Web Dev\Complete FullStack deployed Projects\Latest apps\Reddit Bots\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\src\safety\analyzer.py", line 366, in run_llm_scan
+    data = json.loads(cleaned)
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\husai\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)
+
+2026-10-22 12:33:39,021 [ERROR] RedditShortsPipeline: Contextual LLM safety scan error: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)
+2026-10-22 12:33:39,022 [WARNING] RedditShortsPipeline: Failing safe: LLM check failed in strict safety mode. Rejecting content.
+2026-10-22 12:33:39,022 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=False, Risk=Reject, AllowedMax=low
+2026-10-22 12:33:39,023 [WARNING] RedditShortsPipeline: Post 1x7s19r rejected at Stage 1 Ingestion safety check. Reason: Strict mode fail-safe: Contextual safety check API failed/timed out. Error: Expecting property name enclosed in double quotes: line 2 column 24 (char 25)
+2026-10-22 12:33:39,025 [INFO] RedditShortsPipeline: Successfully logged rejected post 1x7s19r to database.
+2026-10-22 12:33:39,030 [INFO] RedditShortsPipeline: Attempting post safety verification (Try 5/15)...
+2026-10-22 12:33:39,031 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Reddit Ingestion
+2026-10-22 12:33:39,055 [INFO] RedditShortsPipeline: Searching subreddits for posts: r/memes+dankmemes+me_irl+funny+wholesomememes+AdviceAnimals+blursedimages+perfectlycutscreams+AnimalsBeingDerps+cats+dogs+meme+meirl
+2026-10-22 12:33:39,060 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/meme: https://meme-api.com/gimme/meme/16
+2026-10-22 12:33:41,064 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/cats: https://meme-api.com/gimme/cats/16
+2026-10-22 12:33:41,400 [INFO] RedditShortsPipeline: Fetching posts from public meme API for r/AnimalsBeingDerps: https://meme-api.com/gimme/AnimalsBeingDerps/16
+2026-10-22 12:33:41,749 [INFO] RedditShortsPipeline: 🎉 Weighted Selected Reddit Post: r/cats (base weight: 4.0) - ID: 1xayg9k - Title: Look at this absolute unit of a cat...
+2026-10-22 12:33:41,881 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Reddit Ingestion in 2.85s | Metadata: {'id': '1xayg9k', 'subreddit': 'cats', 'title': 'Look at this absolute unit of a cat...'}
+2026-10-22 12:33:41,882 [INFO] RedditShortsPipeline: Downloading meme image from URL: https://i.redd.it/sltb296eqnwh1.png
+2026-10-22 12:33:46,442 [INFO] RedditShortsPipeline: Meme image successfully saved to E:\Web Dev\Complete FullStack deployed Projects\Latest apps\Reddit Bots\Reddit meme YT Shorts\Reddit-Automation-for-YT-Shorts\data\output\meme_image.png (14779035 bytes)
+2026-10-22 12:33:46,446 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Ingestion)...
+2026-10-22 12:33:48,207 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:34:09,450 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 200 OK"
+2026-10-22 12:34:09,460 [INFO] google_genai.models: AFC remote call 1 is done.
+2026-10-22 12:34:09,461 [WARNING] google_genai.types: Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-10-22 12:34:09,472 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-10-22 12:34:09,479 [INFO] RedditShortsPipeline: Safety check results (Stage: After Ingestion): Passed=True, Risk=Safe, AllowedMax=low
+2026-10-22 12:34:11,273 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:34:38,775 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-10-22 12:34:38,777 [WARNING] RedditShortsPipeline: google.genai model 'gemini-3.8-flash' failed (503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}). Trying fallback model...
+2026-10-22 12:34:38,778 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:34:48,393 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:34:48,395 [WARNING] RedditShortsPipeline: google.genai model 'gemini-2.5-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started).', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:34:48,397 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:34:57,368 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:34:57,371 [WARNING] RedditShortsPipeline: google.genai model 'gemini-2.0-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started).', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:34:57,372 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:35:06,269 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:35:06,271 [WARNING] RedditShortsPipeline: google.genai model 'gemini-1.5-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:35:06,271 [WARNING] RedditShortsPipeline: Safety check with image via gemini failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}). Trying fallback with image...
+2026-10-22 12:35:13,077 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 413 Payload Too Large"
+2026-10-22 12:35:13,078 [WARNING] RedditShortsPipeline: Vision safety check failed on fallback (Error code: 413 - {'error': {'message': 'Request Entity Too Large', 'type': 'invalid_request_error', 'code': 'request_too_large'}}). Falling back to text-only safety scan.
+2026-10-22 12:35:14,024 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-10-22 12:35:14,026 [INFO] RedditShortsPipeline: Meme suitability evaluation: passed=True | humor=7/10, simplicity=10/10, universal_appeal=9/10, family_friendly=pass, requires_bk=no
+2026-10-22 12:35:14,027 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Script Generation
+2026-10-22 12:35:14,582 [INFO] RedditShortsPipeline: Sending request to Groq model: qwen/qwen3.8-27b
+2026-10-22 12:35:15,133 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-10-22 12:35:15,141 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Script Generation in 1.11s | Metadata: {'title': 'Absolute Cat Unit', 'word_count': 9, 'emphasis_count': 1}
+2026-10-22 12:35:15,142 [INFO] RedditShortsPipeline: Generated Script Text:
+This feline is an absolute UNIT of pure chaos.
+Emphasis: ['UNIT']
+2026-10-22 12:35:15,146 [INFO] RedditShortsPipeline: Generating optimized metadata for Short...
+2026-10-22 12:35:15,162 [INFO] RedditShortsPipeline: Metadata generated successfully:
+2026-10-22 12:35:15,167 [INFO] RedditShortsPipeline:    Optimized Title: This cat is taking up too much space
+2026-10-22 12:35:15,174 [INFO] RedditShortsPipeline:    Category ID: 23
+2026-10-22 12:35:15,175 [INFO] RedditShortsPipeline:    Tags Count: 20
+2026-10-22 12:35:15,176 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: After Narration)...
+2026-10-22 12:35:16,873 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:35:39,234 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-10-22 12:35:39,236 [WARNING] RedditShortsPipeline: google.genai model 'gemini-3.8-flash' failed (503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}). Trying fallback model...
+2026-10-22 12:35:39,237 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:35:48,233 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:35:48,235 [WARNING] RedditShortsPipeline: google.genai model 'gemini-2.5-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started).', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:35:48,236 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:35:57,196 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:35:57,319 [WARNING] RedditShortsPipeline: google.genai model 'gemini-2.0-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started).', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:35:57,320 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:36:06,528 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-10-22 12:36:06,530 [WARNING] RedditShortsPipeline: google.genai model 'gemini-1.5-flash' failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}). Trying fallback model...
+2026-10-22 12:36:06,530 [WARNING] RedditShortsPipeline: Safety check with image via gemini failed (404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}). Trying fallback with image...
+2026-10-22 12:36:12,167 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 413 Payload Too Large"
+2026-10-22 12:36:12,170 [WARNING] RedditShortsPipeline: Vision safety check failed on fallback (Error code: 413 - {'error': {'message': 'Request Entity Too Large', 'type': 'invalid_request_error', 'code': 'request_too_large'}}). Falling back to text-only safety scan.
+2026-10-22 12:36:13,623 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-10-22 12:36:13,625 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-10-22 12:36:13,626 [INFO] RedditShortsPipeline: Safety check results (Stage: After Narration): Passed=True, Risk=Safe, AllowedMax=low
+2026-10-22 12:36:13,626 [INFO] RedditShortsPipeline: Running content safety analysis (Stage: Before Rendering)...
+2026-10-22 12:36:15,327 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-10-22 12:36:42,612 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent "HTTP/1.1 200 OK"
+2026-10-22 12:36:42,622 [INFO] google_genai.models: AFC remote call 1 is done.
+2026-10-22 12:36:42,626 [WARNING] google_genai.types: Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-10-22 12:36:42,660 [INFO] RedditShortsPipeline: LLM safety check succeeded. Risk: Safe, Categories: []
+2026-10-22 12:36:42,670 [INFO] RedditShortsPipeline: Safety check results (Stage: Before Rendering): Passed=True, Risk=Safe, AllowedMax=low
+2026-10-22 12:36:42,674 [INFO] RedditShortsPipeline: 🎉 Post 1xayg9k passed all pre-rendering safety gates! Proceeding to rendering.
+2026-10-22 12:36:42,674 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Background Selection
+2026-10-22 12:36:42,677 [INFO] RedditShortsPipeline: Reaction assets: 4 normal clip(s), greenscreen=available
+2026-10-22 12:36:42,694 [INFO] RedditShortsPipeline: [Cat Selector] Greenscreen hasn't been used in the last 3 runs. Forcing greenscreen for variety!
+2026-10-22 12:36:43,076 [INFO] RedditShortsPipeline: [Greenscreen] Extracting segment: 14.81s → 19.31s (4.50s) from Long green screen video.mp4 (201.2s total)
+2026-10-22 12:36:43,251 [INFO] RedditShortsPipeline: Using cat reaction clip: gs_segment_14814.mp4 (greenscreen=True)
+2026-10-22 12:36:43,253 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Background Selection in 0.58s | Metadata: {'filename': 'gs_segment_14814.mp4', 'is_cat': True, 'is_greenscreen': True}
+2026-10-22 12:36:43,253 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Overlay Selection
+2026-10-22 12:36:43,254 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Overlay Selection in 0.00s | Metadata: {'path': 'E:\\Web Dev\\Complete FullStack deployed Projects\\Latest apps\\Reddit Bots\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\meme_image.png'}
+2026-10-22 12:36:43,254 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Voice Synthesis
+2026-10-22 12:36:43,258 [INFO] RedditShortsPipeline: Synthesizing voiceover with Edge TTS (voice: en-US-AndrewNeural)
+2026-10-22 12:36:45,460 [ERROR] RedditShortsPipeline: Edge TTS synthesis error: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x0000023B56398170> [The specified network name is no longer available]
+2026-10-22 12:36:45,461 [WARNING] RedditShortsPipeline: Configured TTS provider 'edge' failed: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x0000023B56398170> [The specified network name is no longer available].
+2026-10-22 12:36:45,461 [INFO] RedditShortsPipeline: Attempting fallback to Google TTS (gTTS)...
+2026-10-22 12:36:45,471 [INFO] RedditShortsPipeline: Synthesizing voiceover with Google TTS (gTTS fallback)
+2026-10-22 12:36:45,999 [INFO] RedditShortsPipeline: Generated gTTS voiceover: 3.79s (1 sentences)
+2026-10-22 12:36:46,071 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Voice Synthesis in 2.82s | Metadata: {'duration_s': 3.792, 'sentences': 1}
+2026-10-22 12:36:46,074 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Video Rendering
+2026-10-22 12:36:46,161 [INFO] RedditShortsPipeline: Rendering pipeline (Cat Reaction): Static freeze for 5.79s, then motion for 4.50s | Total duration: 10.29s | Greenscreen: True
+2026-10-22 12:36:47,030 [INFO] RedditShortsPipeline: Adaptive layout: meme_ar=0.75 cat_ar=1.78 → meme_zone=960px cat_zone=640px
+2026-10-22 12:36:47,031 [INFO] RedditShortsPipeline: Greenscreen animal placement chosen: bottom-right
+2026-10-22 12:36:47,032 [INFO] RedditShortsPipeline: Running FFmpeg render (60 FPS, preset: medium, output: final_short.mp4)
+2026-10-22 12:36:54,990 [INFO] RedditShortsPipeline: ✔ Short rendered successfully: final_short.mp4 (1.03MB, 60fps)
+2026-10-22 12:36:54,990 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Video Rendering in 8.92s | Metadata: {'output_video': 'E:\\Web Dev\\Complete FullStack deployed Projects\\Latest apps\\Reddit Bots\\Reddit meme YT Shorts\\Reddit-Automation-for-YT-Shorts\\data\\output\\final_short.mp4'}
+2026-10-22 12:36:54,991 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: Database Update
+2026-10-22 12:36:54,994 [INFO] RedditShortsPipeline: Saved Reddit ID 1xayg9k to history database
+2026-10-22 12:36:54,996 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: Database Update in 0.00s
+2026-10-22 12:36:54,996 [INFO] RedditShortsPipeline: ▶ STARTING STAGE: YouTube Upload
+2026-10-22 12:36:54,997 [INFO] RedditShortsPipeline: ✔ FINISHED STAGE: YouTube Upload in 0.00s | Metadata: {'status': 'skipped'}
+2026-10-22 12:36:54,998 [INFO] RedditShortsPipeline: Cleaning up temporary render files...
