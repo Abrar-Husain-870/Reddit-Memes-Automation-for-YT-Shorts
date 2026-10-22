@@ -59,7 +59,21 @@ async def _synthesize_with_timing(
 
 
 class EdgeVoiceProvider(BaseVoiceProvider):
-    """Microsoft Edge TTS Voice Provider."""
+    """Microsoft Edge TTS Voice Provider with male preference and female fallback."""
+
+    PREFERRED_MALE_VOICES = [
+        "en-US-AndrewNeural",
+        "en-US-GuyNeural",
+        "en-US-ChristopherNeural",
+        "en-US-EricNeural",
+        "en-GB-RyanNeural",
+    ]
+
+    FALLBACK_FEMALE_VOICES = [
+        "en-US-AvaNeural",
+        "en-US-EmmaNeural",
+        "en-US-JennyNeural",
+    ]
 
     def synthesize(
         self, 
@@ -67,29 +81,52 @@ class EdgeVoiceProvider(BaseVoiceProvider):
         output_path: Path, 
         voice: str | None = None
     ) -> Tuple[float, List[SentenceTiming]]:
-        voice = voice or config.TTS_VOICE or "en-US-AndrewNeural"
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info(f"Synthesizing voiceover with Edge TTS (voice: {voice})")
-        try:
-            sentences = asyncio.run(
-                asyncio.wait_for(
-                    _synthesize_with_timing(text, output_path, voice),
-                    timeout=TTS_TIMEOUT,
-                )
-            )
-        except asyncio.TimeoutError:
-            logger.error(f"Edge TTS timed out after {TTS_TIMEOUT}s")
-            # If partial audio was written, attempt to use it, otherwise raise
-            if output_path.exists() and output_path.stat().st_size > 1000:
-                logger.warning("Partial audio file found, using it.")
-                sentences = []
-            else:
-                raise TimeoutError("TTS synthesis timed out and no audio was produced.")
-        except Exception as e:
-            logger.error(f"Edge TTS synthesis error: {e}")
-            raise e
+        # Build candidate voice order:
+        # 1. Configured/requested voice (if male) or default male voices
+        # 2. Remaining preferred male voices
+        # 3. Fallback female voices
+        candidate_voices: List[str] = []
+        preferred = voice or config.TTS_VOICE or "en-US-AndrewNeural"
+        if preferred:
+            candidate_voices.append(preferred)
 
-        duration = _ffprobe_duration(output_path)
-        logger.info(f"Generated Edge TTS voiceover: {duration:.2f}s ({len(sentences)} sentences)")
-        return duration, sentences
+        for mv in self.PREFERRED_MALE_VOICES:
+            if mv not in candidate_voices:
+                candidate_voices.append(mv)
+
+        for fv in self.FALLBACK_FEMALE_VOICES:
+            if fv not in candidate_voices:
+                candidate_voices.append(fv)
+
+        last_error = None
+        for v in candidate_voices:
+            is_female = v in self.FALLBACK_FEMALE_VOICES
+            if is_female:
+                logger.warning(f"Male voices unavailable or failed. Falling back to female voice: {v}")
+            else:
+                logger.info(f"Synthesizing voiceover with Edge TTS (male voice: {v})")
+
+            try:
+                sentences = asyncio.run(
+                    asyncio.wait_for(
+                        _synthesize_with_timing(text, output_path, v),
+                        timeout=TTS_TIMEOUT,
+                    )
+                )
+                duration = _ffprobe_duration(output_path)
+                if duration > 0.1:
+                    voice_type = "female fallback" if is_female else "male"
+                    logger.info(
+                        f"Generated Edge TTS voiceover using {voice_type} voice '{v}': "
+                        f"{duration:.2f}s ({len(sentences)} sentences)"
+                    )
+                    return duration, sentences
+            except Exception as e:
+                logger.warning(f"Edge TTS voice '{v}' failed: {e}. Trying next available voice...")
+                last_error = e
+
+        if last_error:
+            raise last_error
+        raise RuntimeError("All candidate Edge TTS voices failed to synthesize audio.")

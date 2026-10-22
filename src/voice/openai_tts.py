@@ -34,32 +34,47 @@ class OpenAITTSVoiceProvider(BaseVoiceProvider):
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-        data = {
-            "model": config.OPENAI_TTS_MODEL,
-            "input": text,
-            "voice": voice_name
-        }
-        
-        logger.info(f"Synthesizing voiceover with OpenAI TTS (model: {config.OPENAI_TTS_MODEL}, voice: {voice_name})")
-        req = urllib.request.Request(
-            url, 
-            data=json.dumps(data).encode("utf-8"), 
-            headers=headers, 
-            method="POST"
-        )
-        
-        try:
-            with urllib.request.urlopen(req, timeout=120) as response:
-                output_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(output_path, "wb") as f:
-                    f.write(response.read())
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8") if e else ""
-            logger.error(f"OpenAI TTS HTTP Error {e.code}: {err_msg}")
-            raise Exception(f"OpenAI TTS API failed: {err_msg}")
-        except Exception as e:
-            logger.error(f"OpenAI TTS synthesis request failed: {e}")
-            raise e
+        candidate_voices = []
+        preferred = voice or config.TTS_VOICE or "onyx"
+        if preferred:
+            candidate_voices.append(preferred)
+        for mv in ["onyx", "echo", "fable"]:
+            if mv not in candidate_voices:
+                candidate_voices.append(mv)
+        for fv in ["nova", "shimmer", "alloy"]:
+            if fv not in candidate_voices:
+                candidate_voices.append(fv)
+
+        last_error = None
+        for voice_name in candidate_voices:
+            is_female = voice_name in ["nova", "shimmer", "alloy"]
+            voice_type = "female fallback" if is_female else "male"
+            logger.info(f"Synthesizing voiceover with OpenAI TTS ({voice_type} voice: {voice_name})")
+            
+            data = {
+                "model": config.OPENAI_TTS_MODEL,
+                "input": text,
+                "voice": voice_name
+            }
+            req = urllib.request.Request(
+                url, 
+                data=json.dumps(data).encode("utf-8"), 
+                headers=headers, 
+                method="POST"
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=120) as response:
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    with open(output_path, "wb") as f:
+                        f.write(response.read())
+                    break
+            except Exception as e:
+                logger.warning(f"OpenAI TTS voice '{voice_name}' failed: {e}. Trying next...")
+                last_error = e
+        else:
+            if last_error:
+                raise last_error
+            raise RuntimeError("All OpenAI TTS candidate voices failed.")
             
         duration = _ffprobe_duration(output_path)
         sentences = approximate_sentence_timings(text, duration)
